@@ -1,0 +1,12 @@
+Changelog seit der Version 0.0.1 (Stand ??.??.2011)
+===================================================
+
+
+Changelog seit der Version 0.0.0 (Stand 31.10.2011)
+===================================================
+31.10.2011 by Rc
+ - Erstellen der ersten SIARD-Val Programmteile basierend auf SIP-Val v1.0.6
+   A Lesbarkeit (Fertiggestellt)
+   B primäre Verzeichnisstruktur (Fertiggestellt)
+   C Header-Validierung (in Arbeit)
+   I SIARD-Erkennung (Fertiggestellt)

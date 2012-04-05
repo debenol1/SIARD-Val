@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<!-- Common Services -->
+
+	<bean id="textResourceService"
+		class="ch.kostceco.tools.siardval.service.impl.TextResourceServiceImpl">
+	</bean>
+
+	<bean id="configurationService"
+		class="ch.kostceco.tools.siardval.service.impl.ConfigurationServiceImpl">
+		<property name="textResourceService" ref="textResourceService" />
+	</bean>
+
+	<bean id="messageService"
+		class="ch.kostceco.tools.siardval.service.impl.MessageServiceImpl">
+	</bean>
+
+
+	<!-- Validation Services -->
+	<bean id="validationAzipModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationAzipModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean>
+	<bean id="validationBprimaryStructureModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationBprimaryStructureModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean>
+	<bean id="validationCheaderModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationCheaderModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+		<property name="configurationService" ref="configurationService" />
+	</bean> 
+<!--	<bean id="validationDchecksumModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationDchecksumModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean> -->
+<!--	<bean id="validationEstructureModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationEstructureModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean> -->
+<!--	<bean id="validationFcolumnModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationFcolumnModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean> -->
+<!--	<bean id="validationGrowModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationGrowModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean> -->
+<!--	<bean id="validationHcontentModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationHcontentModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean> -->
+	<bean id="validationIrecognitionModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationIrecognitionModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean>
+<!--	<bean id="validationJsurplusFilesModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationJsurplusFilesModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean> -->
+<!--	<bean id="validationKconstraintModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationKconstraintModuleImpl">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="messageService" ref="messageService" />
+	</bean> -->
+
+
+	<bean id="SIARDVal" class="ch.kostceco.tools.siardval.SIARDVal">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<bean id="logconfigurator" class="ch.kostceco.tools.siardval.logging.LogConfigurator">
+		<property name="textResourceService" ref="textResourceService" />
+	</bean>
+
+	<bean id="controller" class="ch.kostceco.tools.siardval.controller.Controller">
+		<property name="textResourceService" ref="textResourceService" />
+		<property name="validationAzipModule" ref="validationAzipModule" />
+		<property name="validationBprimaryStructureModule" ref="validationBprimaryStructureModule" />
+		<property name="validationCheaderModule" ref="validationCheaderModule" /> 
+<!--		<property name="validationDchecksumModule" ref="validationDchecksumModule" /> -->
+<!--		<property name="validationEstructureModule" ref="validationEstructureModule" /> -->
+<!--		<property name="validationFcolumnModule" ref="validationFcolumnModule" /> -->
+<!--		<property name="validationGrowModule" ref="validationGrowModule" /> -->
+<!--		<property name="validationHcontentModule" ref="validationHcontentModule" /> -->
+		<property name="validationIrecognitionModule" ref="validationIrecognitionModule" />
+<!--		<property name="validationJsurplusFilesModule" ref="validationJsurplusFilesModule" /> -->
+<!--		<property name="validationKconstraintModule" ref="validationKconstraintModule" /> -->
+	</bean>
+
+</beans>
