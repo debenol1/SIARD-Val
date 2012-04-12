@@ -1,6 +1,9 @@
-Changelog seit der Version 0.0.1 (Stand ??.??.2011)
+Changelog seit der Version 0.0.1 (Stand 12.04.2012)
 ===================================================
-
+12.04.2012 by Rc
+ - ModulA verbessert, neu wird nicht nach extension geprüft ob es sich 
+   um eine ZIP-Datei handelt, sondern die Datei muss mit PK.. beginnen
+   inkl. bessere Fehlermeldung
 
 Changelog seit der Version 0.0.0 (Stand 31.10.2011)
 ===================================================
