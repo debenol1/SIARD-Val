@@ -105,6 +105,14 @@ public interface MessageConstants {
     String MESSAGE_MODULE_C_METADATA_ERRORS            = "message.module.c.metadata.errors";
     String MESSAGE_MODULE_C_METADATA_ORIGERRORS        = "message.module.c.metadata.origerrors";
     
+    // Modul D Meldungen
+    String MESSAGE_MODULE_D_INVALID_FOLDER             = "message.module.d.invalid.folder";
+    String MESSAGE_MODULE_D_INVALID_FILE        	   = "message.module.d.invalid.file";
+    
+    // Modul H Meldungen
+    String MESSAGE_MODULE_H_INVALID_FOLDER             = "message.module.h.invalid.folder";
+    String MESSAGE_MODULE_H_INVALID_XML                = "message.module.h.invalid.xml";
+
     // Modul I Meldungen
     String MESSAGE_MODULE_I_NOTALLOWEDPUID             = "message.module.i.notallowedpuid";
     String MESSAGE_MODULE_I_NOTALLOWEDEXT              = "message.module.i.notallowedext";
