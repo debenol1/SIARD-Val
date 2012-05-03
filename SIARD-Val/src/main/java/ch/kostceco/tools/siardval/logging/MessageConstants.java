@@ -107,7 +107,9 @@ public interface MessageConstants {
     
     // Modul D Meldungen
     String MESSAGE_MODULE_D_INVALID_FOLDER             = "message.module.d.invalid.folder";
-    String MESSAGE_MODULE_D_INVALID_FILE        	   = "message.module.d.invalid.file";
+    String MESSAGE_MODULE_D_MISSING_FOLDER             = "message.module.d.missing.folder";
+    String MESSAGE_MODULE_D_INVALID_FILE               = "message.module.d.invalid.file";
+    String MESSAGE_MODULE_D_MISSING_FILE               = "message.module.d.missing.file";
     
     // Modul H Meldungen
     String MESSAGE_MODULE_H_INVALID_FOLDER             = "message.module.h.invalid.folder";
@@ -117,4 +119,8 @@ public interface MessageConstants {
     String MESSAGE_MODULE_I_NOTALLOWEDPUID             = "message.module.i.notallowedpuid";
     String MESSAGE_MODULE_I_NOTALLOWEDEXT              = "message.module.i.notallowedext";
     
+    // Modul J Meldungen
+    String MESSAGE_MODULE_J_INVALID_FOLDER             = "message.module.j.invalid.folder";
+    String MESSAGE_MODULE_J_INVALID_FILE               = "message.module.j.invalid.file";
+    String MESSAGE_MODULE_J_INVALID_ENTRY               = "message.module.j.invalid.entry";
 }

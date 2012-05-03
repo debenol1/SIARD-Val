@@ -24,6 +24,7 @@ import ch.kostceco.tools.siardval.exception.module.ValidationCheaderException;
 import ch.kostceco.tools.siardval.exception.module.ValidationDstructureException;
 import ch.kostceco.tools.siardval.exception.module.ValidationHcontentException;
 import ch.kostceco.tools.siardval.exception.module.ValidationIrecognitionException;
+import ch.kostceco.tools.siardval.exception.module.ValidationJsurplusFilesException;
 import ch.kostceco.tools.siardval.logging.Logger;
 import ch.kostceco.tools.siardval.logging.MessageConstants;
 import ch.kostceco.tools.siardval.service.TextResourceService;
@@ -33,6 +34,7 @@ import ch.kostceco.tools.siardval.validation.module.ValidationCheaderModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationDstructureModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationHcontentModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationIrecognitionModule;
+import ch.kostceco.tools.siardval.validation.module.ValidationJsurplusFilesModule;
 //import ch.kostceco.tools.siardval.validation.module.ValidationJsurplusFilesModule;
 //import ch.kostceco.tools.siardval.validation.module.ValidationKconstraintModule;
 
@@ -60,7 +62,7 @@ public class Controller implements MessageConstants {
 //  private ValidationGchecksumModule validationGchecksumModule;
     private ValidationHcontentModule validationHcontentModule;
     private ValidationIrecognitionModule validationIrecognitionModule;
-//    private ValidationJsurplusFilesModule validationJsurplusFilesModule;
+    private ValidationJsurplusFilesModule validationJsurplusFilesModule;
 //    private ValidationKconstraintModule validationKconstraintModule;
 
 
@@ -127,12 +129,12 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
         this.validationIrecognitionModule = validationIrecognitionModule;
     }
 
-/*    public ValidationJsurplusFilesModule getValidationJsurplusFilesModule() {
+    public ValidationJsurplusFilesModule getValidationJsurplusFilesModule() {
         return validationJsurplusFilesModule;
     }
     public void setValidationJsurplusFilesModule(ValidationJsurplusFilesModule validationJsurplusFilesModule) {
         this.validationJsurplusFilesModule = validationJsurplusFilesModule;
-    }*/
+    }
 
 /*    public ValidationKconstraintModule getValidationKconstraintModule() {
         return validationKconstraintModule;
@@ -388,7 +390,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
         }
 
 
-/*        // Validation Step J (Zusätzliche Primärdateien)
+        // Validation Step J (Zusätzliche Primärdateien)
         try {
             if (this.getValidationJsurplusFilesModule().validate(siardDatei)) {
                 LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
@@ -410,7 +412,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
             LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
             LOGGER.logError(e.getMessage());
             return false;
-        }*/
+        }
 
 
 /*        // Validation Step K (Constraint-Validierung)
