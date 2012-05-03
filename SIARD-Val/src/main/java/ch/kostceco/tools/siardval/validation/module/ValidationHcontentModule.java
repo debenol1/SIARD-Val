@@ -25,7 +25,7 @@ import ch.kostceco.tools.siardval.validation.ValidationModule;
  * Validierungsschritt H (Content-Validierung)
  * Sind die XML-Dateien im content valid zu ihrer Schema-Definition (XSD-Dateien)? 
  * valid --> tableZ.xml	valid zu	tableZ.xsd
- * @author ???
+ * @author Ec Christian Eugster
  */
 
 public interface ValidationHcontentModule extends ValidationModule {

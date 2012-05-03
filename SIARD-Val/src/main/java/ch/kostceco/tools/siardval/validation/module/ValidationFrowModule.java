@@ -27,7 +27,7 @@ import ch.kostceco.tools.siardval.validation.ValidationModule;
  * valid --> gleiche Zeilenzahl	(rows in metadata.xml = max = minOccurs in tableZ.xsd
  * Ansonsten: Enthält tableZ.xml die gleiche Anzahl Zeilen wie in metadata.xml definiert?
  * valid --> gleiche Zeilenzahl	(rows in metadata.xml = Anzahl row in tableZ.xml
- * @author ???
+ * @author Do Olivier Debenath
  */
 
 public interface ValidationFrowModule extends ValidationModule {

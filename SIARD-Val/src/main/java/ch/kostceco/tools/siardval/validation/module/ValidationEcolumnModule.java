@@ -22,10 +22,10 @@ import ch.kostceco.tools.siardval.exception.module.ValidationEcolumnException;
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt E (Spalten-Validierung-xml2xsd)
+ * Validierungsschritt E (Spalten-Validierung)
  * Wurden die Angaben aus metadata.xml korrekt in die tableZ.xsd-Dateien übertragen? 
  * valid --> gleiche Spaltendefinitionen 	(Reihenfolge, Anzahl, Type, Nullable)
- * @author ???
+ * @author Do Olivier Debenath
  */
 
 public interface ValidationEcolumnModule extends ValidationModule {
