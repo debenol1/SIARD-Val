@@ -2,6 +2,7 @@ Changelog seit der Version 0.0.1 (Stand 12.04.2012)
 ===================================================
 03.05.2012 by Rc
  - Author und Beschreibung in den einzelnen validation.module(.impl) aktualisiert
+ - Neue Reihenfolge der Module auch in (fr_)messages.properties nachgetragen
  - Changelog nachgetragen
 03.05.2012 by Ec
  - Schreibfehler in src\main\resources\fr_messages.properties behoben
