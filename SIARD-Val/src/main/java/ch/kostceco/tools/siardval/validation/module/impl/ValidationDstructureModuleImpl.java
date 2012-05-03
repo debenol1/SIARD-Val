@@ -37,7 +37,7 @@ import ch.kostceco.tools.siardval.validation.module.ValidationDstructureModule;
  * Stimmt die Struktur aus metadata.xml mit der Datei-Struktur von content überein? 
  * valid --> schema0/table3 in metadata.xml == schema0/table3/tabe3.xsd und table3.xml in content
  * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
- * @author Ec Christian Eugster
+ * @author Christian Eugster
  */
 
 public class ValidationDstructureModuleImpl extends ValidationModuleImpl implements ValidationDstructureModule {
@@ -112,7 +112,7 @@ public class ValidationDstructureModuleImpl extends ValidationModuleImpl impleme
 			List<Element> tables = schema.getChild("tables", ns).getChildren("table", ns);
 			for (Element table : tables)
 			{
-				validateTable(table, ns, pathToWorkDir, schemaPath);
+				valid = valid && validateTable(table, ns, pathToWorkDir, schemaPath);
 			}
 		}
 		else
@@ -144,9 +144,9 @@ public class ValidationDstructureModuleImpl extends ValidationModuleImpl impleme
 		if (tablePath.isDirectory())
 		{
 			File tableXml = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xml").toString());
-			valid = validateFile(tableXml, tablePath);
+			valid = valid && validateFile(tableXml, tablePath);
 			File tableXsd = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xsd").toString());
-			valid = validateFile(tableXsd, tablePath);
+			valid = valid && validateFile(tableXsd, tablePath);
 		}
 		else
 		{

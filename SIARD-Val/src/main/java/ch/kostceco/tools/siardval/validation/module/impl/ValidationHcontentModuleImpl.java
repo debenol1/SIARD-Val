@@ -106,25 +106,25 @@ public class ValidationHcontentModuleImpl extends ValidationModuleImpl implement
                                         " " + tableXml.getName() + " " + getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_XML) + " " + tableXsd.getName());                
                 			}
                 		}
-                		else
-                		{
-                			valid = false;
-                    		getMessageService().logError(
-                                    getTextResourceService().getText(MESSAGE_MODULE_H) + 
-                                    getTextResourceService().getText(MESSAGE_DASHES) + 
-                                    getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_FOLDER) + tablePath.getName());                
-                		}
+//                		else
+//                		{
+//                			valid = false;
+//                    		getMessageService().logError(
+//                                    getTextResourceService().getText(MESSAGE_MODULE_H) + 
+//                                    getTextResourceService().getText(MESSAGE_DASHES) + 
+//                                    getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_FOLDER) + " " + tablePath.getName());                
+//                		}
         			}
         		}
-        		else
-        		{
-        			valid = false;
-        			valid = false;
-            		getMessageService().logError(
-                            getTextResourceService().getText(MESSAGE_MODULE_H) + 
-                            getTextResourceService().getText(MESSAGE_DASHES) + 
-                            getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_FOLDER) + schemaPath.getName());                
-        		}
+//        		else
+//        		{
+//        			valid = false;
+//        			valid = false;
+//            		getMessageService().logError(
+//                            getTextResourceService().getText(MESSAGE_MODULE_H) + 
+//                            getTextResourceService().getText(MESSAGE_DASHES) + 
+//                            getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_FOLDER) + " " + schemaPath.getName());                
+//        		}
         		
         	}
         } 
