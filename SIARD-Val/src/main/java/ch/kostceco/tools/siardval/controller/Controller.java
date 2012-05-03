@@ -21,26 +21,17 @@ import java.io.File;
 import ch.kostceco.tools.siardval.exception.module.ValidationAzipException;
 import ch.kostceco.tools.siardval.exception.module.ValidationBprimaryStructureException;
 import ch.kostceco.tools.siardval.exception.module.ValidationCheaderException;
-//import ch.kostceco.tools.siardval.exception.module.ValidationDchecksumException;
-//import ch.kostceco.tools.siardval.exception.module.ValidationEstructureException;
-//import ch.kostceco.tools.siardval.exception.module.ValidationFcolumnException;
-//import ch.kostceco.tools.siardval.exception.module.ValidationGrowException;
-//import ch.kostceco.tools.siardval.exception.module.ValidationHcontentException;
+import ch.kostceco.tools.siardval.exception.module.ValidationDstructureException;
+import ch.kostceco.tools.siardval.exception.module.ValidationHcontentException;
 import ch.kostceco.tools.siardval.exception.module.ValidationIrecognitionException;
-//import ch.kostceco.tools.siardval.exception.module.ValidationJsurplusFilesException;
-//import ch.kostceco.tools.siardval.exception.module.ValidationKconstraintException;
-
 import ch.kostceco.tools.siardval.logging.Logger;
 import ch.kostceco.tools.siardval.logging.MessageConstants;
 import ch.kostceco.tools.siardval.service.TextResourceService;
 import ch.kostceco.tools.siardval.validation.module.ValidationAzipModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationBprimaryStructureModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationCheaderModule;
-//import ch.kostceco.tools.siardval.validation.module.ValidationDchecksumModule;
-//import ch.kostceco.tools.siardval.validation.module.ValidationEstructureModule;
-//import ch.kostceco.tools.siardval.validation.module.ValidationFcolumnModule;
-//import ch.kostceco.tools.siardval.validation.module.ValidationGrowModule;
-//import ch.kostceco.tools.siardval.validation.module.ValidationHcontentModule;
+import ch.kostceco.tools.siardval.validation.module.ValidationDstructureModule;
+import ch.kostceco.tools.siardval.validation.module.ValidationHcontentModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationIrecognitionModule;
 //import ch.kostceco.tools.siardval.validation.module.ValidationJsurplusFilesModule;
 //import ch.kostceco.tools.siardval.validation.module.ValidationKconstraintModule;
@@ -63,11 +54,11 @@ public class Controller implements MessageConstants {
     private ValidationAzipModule validationAzipModule;
     private ValidationBprimaryStructureModule validationBprimaryStructureModule;
     private ValidationCheaderModule validationCheaderModule;
-//    private ValidationDstructureModule validationDstructureModule;
+    private ValidationDstructureModule validationDstructureModule;
 //    private ValidationEcolumnModule validationEcolumnModule;
 //    private ValidationFrowModule validationFrowModule;
 //  private ValidationGchecksumModule validationGchecksumModule;
-//    private ValidationHcontentModule validationHcontentModule;
+    private ValidationHcontentModule validationHcontentModule;
     private ValidationIrecognitionModule validationIrecognitionModule;
 //    private ValidationJsurplusFilesModule validationJsurplusFilesModule;
 //    private ValidationKconstraintModule validationKconstraintModule;
@@ -94,12 +85,12 @@ public class Controller implements MessageConstants {
         this.validationCheaderModule = validationCheaderModule;
     }
 
-/*    public ValidationDstructureModule getValidationDstructureModule() {
+    public ValidationDstructureModule getValidationDstructureModule() {
         return validationDstructureModule;
     }
     public void setValidationDstructureModule(ValidationDstructureModule validationDstructureModule) {
         this.validationDstructureModule = validationDstructureModule;
-    }*/
+    }
 
 /*    public ValidationEcolumnModule getValidationEcolumnModule() {
         return validationEcolumnModule;
@@ -122,12 +113,12 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
     this.validationGchecksumModule = validationGchecksumModule;
 }*/
 
-/*    public ValidationHcontentModule getValidationHcontentModule() {
+    public ValidationHcontentModule getValidationHcontentModule() {
         return validationHcontentModule;
     }
     public void setValidationHcontentModule(ValidationHcontentModule validationHcontentModule) {
         this.validationHcontentModule = validationHcontentModule;
-    }*/
+    }
 
     public ValidationIrecognitionModule getValidationIrecognitionModule() {
         return validationIrecognitionModule;
@@ -241,7 +232,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
             return false;
         }
 
-/*        // Validation Step D (Struktur-Validierung)
+        // Validation Step D (Struktur-Validierung)
         try {
             if (this.getValidationDstructureModule().validate(siardDatei)) {
                 LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
@@ -265,7 +256,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
             LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
             LOGGER.logError(e.getMessage());
             return false;
-        } */
+        }
 
         return valid;
     }
@@ -347,7 +338,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
         }*/
 
 
-/*        // Validation Step H (Content-Validierung)
+        // Validation Step H (Content-Validierung)
         try {
             if (this.getValidationHcontentModule().validate(siardDatei)) {
                 LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
@@ -369,7 +360,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
             LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
             LOGGER.logError(e.getMessage());
             return false;
-        }*/
+        }
 
 
         // Validation Step I (SIARD-Erkennung)
