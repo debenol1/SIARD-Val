@@ -38,10 +38,11 @@
 		<property name="messageService" ref="messageService" />
 		<property name="configurationService" ref="configurationService" />
 	</bean> 
-<!--	<bean id="validationDchecksumModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationDchecksumModuleImpl">
+	<bean id="validationDstructureModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationDstructureModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
-	</bean> -->
+        <property name="configurationService" ref="configurationService" />
+	</bean>
 <!--	<bean id="validationEstructureModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationEstructureModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
@@ -54,10 +55,11 @@
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
 	</bean> -->
-<!--	<bean id="validationHcontentModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationHcontentModuleImpl">
+	<bean id="validationHcontentModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationHcontentModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
-	</bean> -->
+        <property name="configurationService" ref="configurationService" />
+	</bean>
 	<bean id="validationIrecognitionModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationIrecognitionModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
@@ -86,11 +88,11 @@
 		<property name="validationAzipModule" ref="validationAzipModule" />
 		<property name="validationBprimaryStructureModule" ref="validationBprimaryStructureModule" />
 		<property name="validationCheaderModule" ref="validationCheaderModule" /> 
-<!--		<property name="validationDchecksumModule" ref="validationDchecksumModule" /> -->
+		<property name="validationDstructureModule" ref="validationDstructureModule" />
 <!--		<property name="validationEstructureModule" ref="validationEstructureModule" /> -->
 <!--		<property name="validationFcolumnModule" ref="validationFcolumnModule" /> -->
 <!--		<property name="validationGrowModule" ref="validationGrowModule" /> -->
-<!--		<property name="validationHcontentModule" ref="validationHcontentModule" /> -->
+		<property name="validationHcontentModule" ref="validationHcontentModule" />
 		<property name="validationIrecognitionModule" ref="validationIrecognitionModule" />
 <!--		<property name="validationJsurplusFilesModule" ref="validationJsurplusFilesModule" /> -->
 <!--		<property name="validationKconstraintModule" ref="validationKconstraintModule" /> -->

@@ -22,11 +22,11 @@ import ch.kostceco.tools.siardval.exception.module.ValidationDstructureException
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt D (Struktur-Validierung-xml2xsd)
+ * Validierungsschritt D (Struktur-Validierung)
  * Stimmt die Struktur aus metadata.xml mit jender vom content überein? 
  * valid --> gleiche Struktur 	(z.B. schema0/table3 --> schema0/table3/table3.xsd + table3.xml)
  * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
- * @author ???
+ * @author Ec Christian Eugster
  */
 
 public interface ValidationDstructureModule extends ValidationModule {

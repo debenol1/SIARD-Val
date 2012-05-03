@@ -1,5 +1,15 @@
 Changelog seit der Version 0.0.1 (Stand 12.04.2012)
 ===================================================
+03.05.2012 by Rc
+ - Author und Beschreibung in den einzelnen validation.module(.impl) aktualisiert
+ - Changelog nachgetragen
+03.05.2012 by Ec
+ - Schreibfehler in src\main\resources\fr_messages.properties behoben
+
+02.05.2012 by Ec
+ - Add jdom library
+ - Add modules D and H
+
 12.04.2012 by Rc
  - ModulA verbessert, neu wird nicht nach extension geprüft ob es sich 
    um eine ZIP-Datei handelt, sondern die Datei muss mit PK.. beginnen

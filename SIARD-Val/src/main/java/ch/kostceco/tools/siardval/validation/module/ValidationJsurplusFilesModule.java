@@ -25,7 +25,7 @@ import ch.kostceco.tools.siardval.validation.ValidationModule;
  * Validierungsschritt J (Zusätzliche Primärdateien)
  * Enthält der content-Ordner Dateien oder Ordner die nicht in metadata.xml beschrieben sind ?
  * invalid --> Zusätzliche Ordner oder Dateien im content-Ordner 
- * @author ???
+ * @author Sp Peter Schneider
  */
 
 public interface ValidationJsurplusFilesModule extends ValidationModule {

@@ -36,9 +36,8 @@ import ch.kostceco.tools.siardval.validation.module.ValidationDstructureModule;
  * Validierungsschritt D (Struktur-Validierung)
  * Stimmt die Struktur aus metadata.xml mit der Datei-Struktur von content überein? 
  * valid --> schema0/table3 in metadata.xml == schema0/table3/tabe3.xsd und table3.xml in content
- * Bemerkung --> zusätzliche Ordner oder Dateien wie z.B. metadata.xls sind im header-Ordner erlaubt
  * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
- * @author Rc Claire Röthlisberger, KOST-CECO
+ * @author Ec Christian Eugster
  */
 
 public class ValidationDstructureModuleImpl extends ValidationModuleImpl implements ValidationDstructureModule {
