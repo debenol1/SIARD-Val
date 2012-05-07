@@ -33,7 +33,9 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import ch.kostceco.tools.siardval.exception.module.ValidationHcontentException;
 import ch.kostceco.tools.siardval.service.ConfigurationService;
@@ -98,34 +100,9 @@ public class ValidationHcontentModuleImpl extends ValidationModuleImpl implement
                 			File tableXml = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xml").toString());
                 			File tableXsd = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xsd").toString());
                 			valid = valid && validate(tableXml, tableXsd);
-                			if (!valid)
-                			{
-                        		getMessageService().logError(
-                                        getTextResourceService().getText(MESSAGE_MODULE_H) + 
-                                        getTextResourceService().getText(MESSAGE_DASHES) + 
-                                        " " + tableXml.getName() + " " + getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_XML) + " " + tableXsd.getName());                
-                			}
                 		}
-//                		else
-//                		{
-//                			valid = false;
-//                    		getMessageService().logError(
-//                                    getTextResourceService().getText(MESSAGE_MODULE_H) + 
-//                                    getTextResourceService().getText(MESSAGE_DASHES) + 
-//                                    getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_FOLDER) + " " + tablePath.getName());                
-//                		}
         			}
         		}
-//        		else
-//        		{
-//        			valid = false;
-//        			valid = false;
-//            		getMessageService().logError(
-//                            getTextResourceService().getText(MESSAGE_MODULE_H) + 
-//                            getTextResourceService().getText(MESSAGE_DASHES) + 
-//                            getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_FOLDER) + " " + schemaPath.getName());                
-//        		}
-        		
         	}
         } 
         catch (java.io.IOException ioe) 
@@ -164,9 +141,68 @@ public class ValidationHcontentModuleImpl extends ValidationModuleImpl implement
 		SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
 		Schema schema = factory.newSchema(schemaLocation);
 		Validator validator = schema.newValidator();
+		ValidationErrorHandler errorHandler = new ValidationErrorHandler(xmlFile, schemaLocation);
+		validator.setErrorHandler(errorHandler);
 		Source source = new StreamSource(xmlFile);
 		validator.validate(source);
-		return true;
+		return errorHandler.isValid();
     }
 
+    private class ValidationErrorHandler implements ErrorHandler 
+    {
+    	private boolean valid = true;
+    	
+    	private File xmlFile;
+    	
+    	private File schemaLocation;
+    	
+    	public ValidationErrorHandler(File xmlFile, File schemaLocation)
+    	{
+    		this.xmlFile = xmlFile;
+    		this.schemaLocation = schemaLocation;
+    	}
+    	
+    	@Override
+    	public void error(SAXParseException e) throws SAXException 
+    	{
+    		if (valid)
+    		{
+            	valid = false;
+    		}
+    		logError(e);
+    	}
+
+    	@Override
+    	public void fatalError(SAXParseException e) throws SAXException 
+    	{
+    		if (valid)
+    		{
+            	valid = false;
+    		}
+    		logError(e);
+    	}
+
+    	@Override
+    	public void warning(SAXParseException e) throws SAXException 
+    	{
+    		if (valid)
+    		{
+            	valid = false;
+    		}
+    		logError(e);
+    	}
+    	
+    	private void logError(SAXParseException e)
+    	{
+            getMessageService().logError(
+                    getTextResourceService().getText(MESSAGE_MODULE_H) + 
+                    getTextResourceService().getText(MESSAGE_DASHES) + 
+                    getTextResourceService().getText(MESSAGE_MODULE_H_INVALID_ERROR, xmlFile.getName(), schemaLocation.getName(), e.getLineNumber(), e.getColumnNumber(), e.getLocalizedMessage()));
+        }
+    	
+    	public boolean isValid()
+    	{
+    		return valid;
+    	}
+    }
 }
