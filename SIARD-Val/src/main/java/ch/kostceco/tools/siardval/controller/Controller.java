@@ -266,7 +266,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
     
     public boolean executeOptional(File siardDatei) {
         boolean valid = true;
-        System.out.println("Debug: " + this.getValidationEcolumnModule().toString());
+        
        // Validation Step E (Spalten-Validierung)
         try {
             if (this.getValidationEcolumnModule().validate(siardDatei)) {
