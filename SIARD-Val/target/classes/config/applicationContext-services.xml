@@ -43,10 +43,10 @@
 		<property name="messageService" ref="messageService" />
         <property name="configurationService" ref="configurationService" />
 	</bean>
-<!--	<bean id="validationEstructureModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationEstructureModuleImpl">
+    <bean id="validationEcolumnModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationEcolumnModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
-	</bean> -->
+	</bean>
 <!--	<bean id="validationFcolumnModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationFcolumnModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
@@ -90,7 +90,7 @@
 		<property name="validationBprimaryStructureModule" ref="validationBprimaryStructureModule" />
 		<property name="validationCheaderModule" ref="validationCheaderModule" /> 
 		<property name="validationDstructureModule" ref="validationDstructureModule" />
-<!--		<property name="validationEstructureModule" ref="validationEstructureModule" /> -->
+        <property name="validationEcolumnModule" ref="validationEcolumnModule" />
 <!--		<property name="validationFcolumnModule" ref="validationFcolumnModule" /> -->
 <!--		<property name="validationGrowModule" ref="validationGrowModule" /> -->
 		<property name="validationHcontentModule" ref="validationHcontentModule" />

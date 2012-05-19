@@ -22,6 +22,7 @@ import ch.kostceco.tools.siardval.exception.module.ValidationAzipException;
 import ch.kostceco.tools.siardval.exception.module.ValidationBprimaryStructureException;
 import ch.kostceco.tools.siardval.exception.module.ValidationCheaderException;
 import ch.kostceco.tools.siardval.exception.module.ValidationDstructureException;
+import ch.kostceco.tools.siardval.exception.module.ValidationEcolumnException;
 import ch.kostceco.tools.siardval.exception.module.ValidationHcontentException;
 import ch.kostceco.tools.siardval.exception.module.ValidationIrecognitionException;
 import ch.kostceco.tools.siardval.exception.module.ValidationJsurplusFilesException;
@@ -32,6 +33,7 @@ import ch.kostceco.tools.siardval.validation.module.ValidationAzipModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationBprimaryStructureModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationCheaderModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationDstructureModule;
+import ch.kostceco.tools.siardval.validation.module.ValidationEcolumnModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationHcontentModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationIrecognitionModule;
 import ch.kostceco.tools.siardval.validation.module.ValidationJsurplusFilesModule;
@@ -57,7 +59,7 @@ public class Controller implements MessageConstants {
     private ValidationBprimaryStructureModule validationBprimaryStructureModule;
     private ValidationCheaderModule validationCheaderModule;
     private ValidationDstructureModule validationDstructureModule;
-//    private ValidationEcolumnModule validationEcolumnModule;
+    private ValidationEcolumnModule validationEcolumnModule;
 //    private ValidationFrowModule validationFrowModule;
 //  private ValidationGchecksumModule validationGchecksumModule;
     private ValidationHcontentModule validationHcontentModule;
@@ -93,13 +95,12 @@ public class Controller implements MessageConstants {
     public void setValidationDstructureModule(ValidationDstructureModule validationDstructureModule) {
         this.validationDstructureModule = validationDstructureModule;
     }
-
-/*    public ValidationEcolumnModule getValidationEcolumnModule() {
+     public ValidationEcolumnModule getValidationEcolumnModule() {
         return validationEcolumnModule;
     }
     public void setValidationEcolumnModule(ValidationEcolumnModule validationEcolumnModule) {
         this.validationEcolumnModule = validationEcolumnModule;
-    }*/
+    }
 
 /*    public ValidationFrowModule getValidationFrowModule() {
         return validationFrowModule;
@@ -235,7 +236,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
         }
 
         // Validation Step D (Struktur-Validierung)
-        try {
+        /*try {
             if (this.getValidationDstructureModule().validate(siardDatei)) {
                 LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
                         getTextResourceService().getText(MESSAGE_MODULE_D)));
@@ -258,21 +259,23 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
             LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
             LOGGER.logError(e.getMessage());
             return false;
-        }
+        }*/
 
         return valid;
     }
     
     public boolean executeOptional(File siardDatei) {
         boolean valid = true;
-
-/*        // Validation Step E (Spalten-Validierung)
+        System.out.println("Debug: " + this.getValidationEcolumnModule().toString());
+       // Validation Step E (Spalten-Validierung)
         try {
             if (this.getValidationEcolumnModule().validate(siardDatei)) {
+            	
                 LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
                         getTextResourceService().getText(MESSAGE_MODULE_E)));
                 this.getValidationEcolumnModule().getMessageService().print();
             } else {
+            	
                 LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
                         getTextResourceService().getText(MESSAGE_MODULE_E))
                         + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_E));
@@ -280,15 +283,18 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
                 valid = false;
             }
         } catch (ValidationEcolumnException e) {
+        	
             LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
                     getTextResourceService().getText(MESSAGE_MODULE_E), e.getMessage()));
             this.getValidationEcolumnModule().getMessageService().print();
+            System.out.println("Debug: " + e.getMessage());
             valid = false;
-        } catch (Exception e) {          
+        } catch (Exception e) {
+        	
             LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
             LOGGER.logError(e.getMessage());
             return false;
-        }*/
+        }
 
 
 /*        // Validation Step F (Zeilen-Validierung)
@@ -337,7 +343,7 @@ public void setValidationGchecksumModule(ValidationGchecksumModule validationGch
             LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
             LOGGER.logError(e.getMessage());
             return false;
-        }*/
+        }
 
 
         // Validation Step H (Content-Validierung)
