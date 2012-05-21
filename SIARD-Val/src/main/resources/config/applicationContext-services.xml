@@ -64,10 +64,11 @@
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
 	</bean>
-<!--	<bean id="validationJsurplusFilesModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationJsurplusFilesModuleImpl">
+	<bean id="validationJsurplusFilesModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationJsurplusFilesModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
-	</bean> -->
+        <property name="configurationService" ref="configurationService" />
+	</bean>
 <!--	<bean id="validationKconstraintModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationKconstraintModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
@@ -94,7 +95,7 @@
 <!--		<property name="validationGrowModule" ref="validationGrowModule" /> -->
 		<property name="validationHcontentModule" ref="validationHcontentModule" />
 		<property name="validationIrecognitionModule" ref="validationIrecognitionModule" />
-<!--		<property name="validationJsurplusFilesModule" ref="validationJsurplusFilesModule" /> -->
+		<property name="validationJsurplusFilesModule" ref="validationJsurplusFilesModule" />
 <!--		<property name="validationKconstraintModule" ref="validationKconstraintModule" /> -->
 	</bean>
 

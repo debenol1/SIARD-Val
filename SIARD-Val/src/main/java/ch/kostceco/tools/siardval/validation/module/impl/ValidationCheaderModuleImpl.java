@@ -222,7 +222,7 @@ public class ValidationCheaderModuleImpl extends ValidationModuleImpl implements
             getMessageService().logError(
                     getTextResourceService().getText(MESSAGE_MODULE_C) + 
                     getTextResourceService().getText(MESSAGE_DASHES) + 
-                    getTextResourceService().getText(MESSAGE_MODULE_C_METADATA_ERRORS, saxParseException.getLineNumber()));                
+                    getTextResourceService().getText(MESSAGE_MODULE_C_METADATA_ERRORS, saxParseException.getLineNumber(), saxParseException.getColumnNumber(), saxParseException.getMessage()));                
         }
         public void fatalError(SAXParseException exception) throws SAXException {
             validationError = true;
@@ -230,7 +230,7 @@ public class ValidationCheaderModuleImpl extends ValidationModuleImpl implements
             getMessageService().logError(
                     getTextResourceService().getText(MESSAGE_MODULE_C) + 
                     getTextResourceService().getText(MESSAGE_DASHES) + 
-                    getTextResourceService().getText(MESSAGE_MODULE_C_METADATA_ERRORS, saxParseException.getLineNumber()));                
+                    getTextResourceService().getText(MESSAGE_MODULE_C_METADATA_ERRORS, saxParseException.getLineNumber(), saxParseException.getColumnNumber(), saxParseException.getMessage()));                
         }
         public void warning(SAXParseException exception) throws SAXException {
         	// Warnungen werden nicht ausgegeben

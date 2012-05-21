@@ -37,7 +37,7 @@ import ch.kostceco.tools.siardval.validation.module.ValidationDstructureModule;
  * Stimmt die Struktur aus metadata.xml mit der Datei-Struktur von content überein? 
  * valid --> schema0/table3 in metadata.xml == schema0/table3/tabe3.xsd und table3.xml in content
  * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
- * @author Ec Christian Eugster
+ * @author Christian Eugster
  */
 
 public class ValidationDstructureModuleImpl extends ValidationModuleImpl implements ValidationDstructureModule {
@@ -77,55 +77,7 @@ public class ValidationDstructureModuleImpl extends ValidationModuleImpl impleme
         	List<Element> schemas = document.getRootElement().getChild("schemas", ns).getChildren("schema", ns);
         	for (Element schema : schemas)
         	{
-        		Element schemaFolder = schema.getChild("folder", ns);
-                File schemaPath = new File(new StringBuilder(pathToWorkDir).append(File.separator).append("content").append(File.separator).append(schemaFolder.getText()).toString());
-        		if (schemaPath.isDirectory())
-        		{
-        			List<Element> tables = schema.getChild("tables", ns).getChildren("table", ns);
-        			for (Element table : tables)
-        			{
-        				Element tableFolder = table.getChild("folder", ns);
-                		File tablePath = new File(new StringBuilder(schemaPath.getAbsolutePath()).append(File.separator).append(tableFolder.getText()).toString());
-                		if (tablePath.isDirectory())
-                		{
-                			File tableXml = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xml").toString());
-                			File tableXsd = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xsd").toString());
-                			if (!tableXml.isFile())
-                			{
-                				valid = false;
-                    			getMessageService().logError(
-                                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
-                                        getTextResourceService().getText(MESSAGE_DASHES) + 
-                                        getTextResourceService().getText(MESSAGE_MODULE_D_INVALID_FILE) + tableXml.getName());                
-                			}
-                			if (!tableXsd.isFile())
-                			{
-                   				valid = false;
-                    			getMessageService().logError(
-                                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
-                                        getTextResourceService().getText(MESSAGE_DASHES) + 
-                                        getTextResourceService().getText(MESSAGE_MODULE_D_INVALID_FILE) + tableXsd.getName());                
-                			}
-                		}
-                		else
-                		{
-                			valid = false;
-                    		getMessageService().logError(
-                                    getTextResourceService().getText(MESSAGE_MODULE_D) + 
-                                    getTextResourceService().getText(MESSAGE_DASHES) + 
-                                    getTextResourceService().getText(MESSAGE_MODULE_D_INVALID_FOLDER) + tablePath.getName());                
-                		}
-        			}
-        		}
-        		else
-        		{
-        			valid = false;
-            		getMessageService().logError(
-                            getTextResourceService().getText(MESSAGE_MODULE_D) + 
-                            getTextResourceService().getText(MESSAGE_DASHES) + 
-                            getTextResourceService().getText(MESSAGE_MODULE_D_INVALID_FOLDER) + schemaPath.getName());                
-        		}
-        		
+        		valid = validateSchema(schema, ns, pathToWorkDir);
         	}
         } 
         catch (java.io.IOException ioe) 
@@ -149,4 +101,95 @@ public class ValidationDstructureModuleImpl extends ValidationModuleImpl impleme
 
         return valid;
     }
- }
+    
+    private boolean validateSchema(Element schema, Namespace ns, String pathToWorkDir)
+    {
+    	boolean valid = true;
+		Element schemaFolder = schema.getChild("folder", ns);
+        File schemaPath = new File(new StringBuilder(pathToWorkDir).append(File.separator).append("content").append(File.separator).append(schemaFolder.getText()).toString());
+		if (schemaPath.isDirectory())
+		{
+			List<Element> tables = schema.getChild("tables", ns).getChildren("table", ns);
+			for (Element table : tables)
+			{
+				valid = valid && validateTable(table, ns, pathToWorkDir, schemaPath);
+			}
+		}
+		else
+		{
+			valid = false;
+			if (schemaPath.exists())
+			{
+        		getMessageService().logError(
+                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
+                        getTextResourceService().getText(MESSAGE_DASHES) + 
+                        getTextResourceService().getText("content" + " " + MESSAGE_MODULE_D_INVALID_FOLDER) + " " + schemaPath.getName() + " in ");                
+			}
+			else
+			{
+        		getMessageService().logError(
+                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
+                        getTextResourceService().getText(MESSAGE_DASHES) + 
+                        getTextResourceService().getText(MESSAGE_MODULE_D_MISSING_FOLDER) + " " + "content" + ": " + schemaPath.getName());                
+			}
+		}
+		return valid;
+    }
+    
+    private boolean validateTable(Element table, Namespace ns, String pathToWorkDir, File schemaPath)
+    {
+    	boolean valid = true;
+		Element tableFolder = table.getChild("folder", ns);
+		File tablePath = new File(new StringBuilder(schemaPath.getAbsolutePath()).append(File.separator).append(tableFolder.getText()).toString());
+		if (tablePath.isDirectory())
+		{
+			File tableXml = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xml").toString());
+			valid = valid && validateFile(tableXml, tablePath);
+			File tableXsd = new File(new StringBuilder(tablePath.getAbsolutePath()).append(File.separator).append(tableFolder.getText() +".xsd").toString());
+			valid = valid && validateFile(tableXsd, tablePath);
+		}
+		else
+		{
+			valid = false;
+			if (tablePath.exists())
+			{
+        		getMessageService().logError(
+                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
+                        getTextResourceService().getText(MESSAGE_DASHES) + 
+                        getTextResourceService().getText(schemaPath.getName() + " " + MESSAGE_MODULE_D_INVALID_FOLDER) + " " + tablePath.getName() + " in ");                
+			}
+			else
+			{
+        		getMessageService().logError(
+                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
+                        getTextResourceService().getText(MESSAGE_DASHES) + 
+                        getTextResourceService().getText(MESSAGE_MODULE_D_MISSING_FOLDER) + " " + schemaPath.getName() + ": " + tablePath.getName());                
+			}
+		}
+		return valid;
+    }
+    
+    private boolean validateFile(File file, File parent)
+    {
+    	boolean valid = true;
+		if (!file.isFile())
+		{
+			valid = false;
+			if (file.exists())
+			{
+    			getMessageService().logError(
+                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
+                        getTextResourceService().getText(MESSAGE_DASHES) + 
+                        getTextResourceService().getText(parent.getName() + " " + MESSAGE_MODULE_D_INVALID_FILE) + " " + file.getName());                
+			}
+			else
+			{
+    			getMessageService().logError(
+                        getTextResourceService().getText(MESSAGE_MODULE_D) + 
+                        getTextResourceService().getText(MESSAGE_DASHES) + 
+                        getTextResourceService().getText(MESSAGE_MODULE_D_MISSING_FILE) + " " + parent.getName() + ": " + file.getName());                
+			}
+		}
+		return valid;
+    }
+}
