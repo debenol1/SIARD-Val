@@ -32,7 +32,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.jdom2.Text;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -44,10 +43,9 @@ import ch.kostceco.tools.siardval.validation.ValidationModuleImpl;
 import ch.kostceco.tools.siardval.validation.module.ValidationJsurplusFilesModule;
 
 /**
- * Validierungsschritt D (Struktur-Validierung)
- * Stimmt die Struktur aus metadata.xml mit der Datei-Struktur von content überein? 
- * valid --> schema0/table3 in metadata.xml == schema0/table3/tabe3.xsd und table3.xml in content
- * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
+ * Validierungsschritt J (Zusätzliche Primärdateien)
+ * Enthält der content-Ordner Dateien oder Ordner die nicht in metadata.xml beschrieben sind ?
+ * invalid --> Zusätzliche Ordner oder Dateien im content-Ordner 
  * @author Ec Christian Eugster
  */
 
