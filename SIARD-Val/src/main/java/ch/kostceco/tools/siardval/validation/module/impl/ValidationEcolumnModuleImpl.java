@@ -2,23 +2,23 @@ package ch.kostceco.tools.siardval.validation.module.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
-import java.util.zip.ZipFile;
-
-
 import org.jaxen.JaxenException;
-import org.jaxen.SimpleNamespaceContext;
 import org.jaxen.jdom.JDOMXPath;
+
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
+
 
 
 
@@ -38,13 +38,16 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	//Validation context related properties
 	private Properties validationProperties;
 	
+	//Content of the SIARD package
+	private HashMap<String, File> siardFiles;
+	private HashMap<String, Document> siardDocuments;
+	private File metadataXML;
+	
 	private List<Element> siardSchemas;
 	private List<Element> xmlElements;
 	private List<Element> xsdElements;
 	
-	//XML processing related properties
-	private String pathToMetadataXML;
-	
+	//XML related properties
 	private String namespaceURI;
 	
 	private String xmlPrefix;
@@ -52,19 +55,14 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	
 	private Namespace xmlNamespace;
 	private Namespace xsdNamespace;
-	
-    
-    
-    
+	    
 	@Override
 	public boolean validate(File siardDatei) throws ValidationEcolumnException {
 		
 		//Test parameter. True if all validations passed successfully
 		boolean valid = true;
-				
+		
 		try {
-			
-			
 			
 			//Initialize the validation context
 			prepareColumnValidation(siardDatei);
@@ -133,127 +131,33 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		return valid;
 	}
 	
-	private void prepareColumnValidation(File siardDatei) throws JDOMException, IOException, JaxenException {
+	private void prepareColumnValidation(File siardDatei) 
+			throws JDOMException, IOException, JaxenException {
 		    	
     	try {
     		
-    		//Initializing the validation context properties
-        	String propertiesName = "/validation.properties";
-        	InputStream propertiesInputStream = getClass().getResourceAsStream(propertiesName);
-        	Properties properties = new Properties();
-    		properties.load(propertiesInputStream);
-    		
     		//Assigning properties to the validation context
-          	this.setValidationProperties(properties);
-    				
-          	Zip64File zipfile = new Zip64File(siardDatei);
-            List<FileEntry> fileEntryList = zipfile.getListFileEntries();
-            
-            String pathToWorkDir = getConfigurationService().getPathToWorkDir();
-            File tmpDir = new File(pathToWorkDir);
-            
-            for (FileEntry fileEntry : fileEntryList) {
-                
-            	if (!fileEntry.isDirectory()) {
-                    
-                	byte[] buffer = new byte[8192];
-                    
-                	// Scheibe die Datei an den richtigen Ort respektive in den richtigen Ordner der ggf angelegt werden muss.
-                    EntryInputStream eis = zipfile.openEntryInputStream(fileEntry.getName());
-                    File newFile = new File(tmpDir, fileEntry.getName());
-                    File parent = newFile.getParentFile();
-                    if (!parent.exists()) {
-                        parent.mkdirs();
-                    }
-                    FileOutputStream fos = new FileOutputStream(newFile);
-                    for (int iRead = eis.read(buffer); iRead >= 0; iRead = eis.read(buffer)){
-                        fos.write(buffer, 0, iRead);
-                    }
-                    eis.close();
-                    fos.close();
-                    // Festhalten von metadata.xml und metadata.xsd
-             
-                }
-            }
-            
-            
-                      	                      
+          	this.setValidationProperties(this.initializeProperties());
           	
+          	//Assigning JDOM documents for all involved XML files to the validation context
+          	this.prepareXMLAccess(this.getValidationProperties());
           	
+          	//Assigning extracted SIARD content to the validation context
+          	this.setSiardFiles(this.extractSiardArchive(siardDatei));
+          	          	
+          	//Assigning metadata.xml to the validation context
+            this.setMetadataXML(this.pickMetadataXML(this.getValidationProperties()));
           	
-          	//Building the path to metadata.xml in the SIARD directory
-            /*String pathToWorkingDirectory = getConfigurationService().getPathToWorkDir();
-    		String relativePathToMetadataXML = properties.getProperty("path.to.metadata.xml");
-    		    		   		
-    		StringBuilder stringBuilder = new StringBuilder();
-    		stringBuilder.append(pathToWorkingDirectory);
-    		stringBuilder.append("/");
-    		stringBuilder.append(relativePathToMetadataXML);
-    		
-    		String absolutePathToMetadataXML = stringBuilder.toString();
-    		
-    		System.out.println(siardDatei.getAbsolutePath());
-    		
-    		
-    		//Assigning the path to metadata.xml to the validation context
-    		this.setPathToMetadataXML(absolutePathToMetadataXML);
-    		
-    		//Creating the JDOM2 Document from the metadata.xml
-            File metadataXml = new File(absolutePathToMetadataXML);
-            InputStream metadataXMLInputStream = new FileInputStream(metadataXml);
+            //Assigning JDOM Documents for all XML files in SIARD archive to the validation context
+            this.buildDocuments(this.getMetadataXML(), this.getValidationProperties());
             
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(metadataXMLInputStream);
-            
-            //Setting the namespace URI
-            Element rootElement = document.getRootElement();
-            String namespaceURI = rootElement.getNamespaceURI();
-            
-            this.setNamespaceURI(namespaceURI);
-            
-            //Setting the XML prefix to access metadata.xml and the different table.xsd
-            //The prefices are stored in validation.properties
-            String xmlPrefix = properties.getProperty("metadata.xml.prefix");
-            String xsdPrefix = properties.getProperty("table.xsd.prefix");
-            
-            this.setXmlPrefix(xmlPrefix);
-            this.setXsdPrefix(xsdPrefix);
-            
-            //Setting the namespaces to access metadata.xml and the different table.xsd
-            Namespace xmlNamespace = Namespace.getNamespace(xmlPrefix, namespaceURI);
-            Namespace xsdNamespace = Namespace.getNamespace(xsdPrefix, namespaceURI);
-            
-            this.setXmlNamespace(xmlNamespace);
-            this.setXsdNamespace(xsdNamespace);
-            
-            //Configuring xpath to get the <schema> elements of metadata.xml to the validation context
-            String pathToSchemaElements = properties.getProperty("xpath.to.siard.schemas");
-            JDOMXPath xpathToSchemaElements = new JDOMXPath(pathToSchemaElements);
-            
-            SimpleNamespaceContext simpleNamespaceContext = new SimpleNamespaceContext();
-            simpleNamespaceContext.addNamespace(xmlPrefix, namespaceURI);
-            
-            xpathToSchemaElements.setNamespaceContext(simpleNamespaceContext);
-            
-            List<Element> siardSchemas = ((List<Element>) xpathToSchemaElements.selectNodes(document));
-            
-            for (Element e : siardSchemas) {
-            	System.out.println(e.getName());
-            }
-            
-            this.setSiardSchemas(siardSchemas);*/
-                   	
+                     	
     	} catch (Exception e) {
     		System.out.println(e.getMessage());
-    	} finally {
-    		//Cleaning up open streams
-            //propertiesInputStream.close();
-            //metadataXMLInputStream.close();
-    	}
-    	
+    	} 
 	}
 	
-	
+	//Validation methods
 	private boolean validateAttributeCount() throws JDOMException, IOException, JaxenException {
 		return false;
 	}
@@ -268,6 +172,137 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	
 	private boolean validateAttributeType() throws JDOMException, IOException, JaxenException {
 		return false;
+	}
+	
+	private Properties initializeProperties() throws IOException {
+		
+		//Initializing the validation context properties
+    	String propertiesName = "/validation.properties";
+    	InputStream propertiesInputStream = getClass().getResourceAsStream(propertiesName);
+    	
+    	Properties properties = new Properties();
+		properties.load(propertiesInputStream);
+		
+		return properties;
+	}
+	
+	private void prepareXMLAccess(Properties properties) {
+			
+		//Setting the namespaces to access metadata.xml and the different table.xsd
+        Namespace xmlNamespace = Namespace.getNamespace(xmlPrefix, namespaceURI);
+        Namespace xsdNamespace = Namespace.getNamespace(xsdPrefix, namespaceURI);
+        
+        //Assigning namespace info to the validation context
+        this.setXmlNamespace(xmlNamespace);
+        this.setXsdNamespace(xsdNamespace);
+        
+        //Setting the XML prefix to access metadata.xml and the different table.xsd
+        //The prefices are stored in validation.properties
+        String xmlPrefix = properties.getProperty("metadata.xml.prefix");
+        String xsdPrefix = properties.getProperty("table.xsd.prefix");
+        
+        //Assigning prefix to the validation context
+        this.setXmlPrefix(xmlPrefix);
+        this.setXsdPrefix(xsdPrefix);
+        
+	}
+	
+	//Helper methods
+	private HashMap<String, File> extractSiardArchive(File packedSiardArchive) 
+			throws FileNotFoundException, IOException {
+						
+		Zip64File zipfile = new Zip64File(packedSiardArchive);
+        List<FileEntry> fileEntryList = zipfile.getListFileEntries();
+        
+        String pathToWorkDir = getConfigurationService().getPathToWorkDir();
+        File tmpDir = new File(pathToWorkDir);
+        
+        HashMap<String, File> extractedSiardFiles = new HashMap<String, File>();
+        
+        for (FileEntry fileEntry : fileEntryList) {
+        	if (!fileEntry.isDirectory()) {
+        		
+            	byte[] buffer = new byte[8192];
+                
+                EntryInputStream eis = zipfile.openEntryInputStream(fileEntry.getName());
+                
+                File newFile = new File(tmpDir, fileEntry.getName());
+                File parent = newFile.getParentFile();
+                
+                if (!parent.exists()) {
+                    parent.mkdirs();
+                }
+                
+                FileOutputStream fos = new FileOutputStream(newFile);
+                
+                for (int iRead = eis.read(buffer); iRead >= 0; iRead = eis.read(buffer)){
+                    fos.write(buffer, 0, iRead);
+                }
+                
+                extractedSiardFiles.put(newFile.getPath(), newFile);
+                eis.close();
+                fos.close();                 
+            }
+        }
+        
+        return extractedSiardFiles;
+	}
+	
+	private File pickMetadataXML (Properties properties) {
+		
+		HashMap<String, File> siardFiles = this.getSiardFiles();
+		String pathToMetadataXML = this.getConfigurationService().getPathToWorkDir();
+		
+		pathToMetadataXML = pathToMetadataXML+properties.getProperty("siard.description");
+      	File metadataXML = siardFiles.get(pathToMetadataXML);
+      	
+		return metadataXML;
+		
+	}
+	
+	private HashMap<String, Document> buildDocuments(File metadataXML, Properties properties) 
+			throws JDOMException, FileNotFoundException, IOException, JaxenException {
+		
+		//Initialize the empty HashMap
+		HashMap<String, Document> siardDocuments = new HashMap<String, Document>();
+		
+		//Create JDOMDocument of metadata.XML
+		InputStream inputStream = new FileInputStream(metadataXML);
+		SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(inputStream);
+        
+        //Add JDOMDocument of metadata.xml to the resulting HashMap 
+        siardDocuments.put(metadataXML.getPath(), document);
+        
+        //Setting the namespace URI to the validation Context
+        Element rootElement = document.getRootElement();
+        String namespaceURI = rootElement.getNamespaceURI();
+                
+        //Assigning the XML namespace to the validation context
+        this.setNamespaceURI(namespaceURI);
+        
+        //Build JDOM Documents for all referenced table.xsd schemata
+        String pathToSchemaElements = properties.getProperty("xpath.to.siard.schemas");
+        
+        JDOMXPath xpathToSchemaElements = new JDOMXPath(pathToSchemaElements);
+        
+        /*SimpleNamespaceContext simpleNamespaceContext = new SimpleNamespaceContext();
+		simpleNamespaceContext.addNamespace(this.getXmlPrefix(), this.getNamespaceURI());
+		
+		xpathToSchemaElements.setNamespaceContext(simpleNamespaceContext);*/
+		
+        System.out.println(pathToSchemaElements.toString());
+        
+        //@SuppressWarnings("unchecked")
+		/*List<Element> siardSchemas = ((List<Element>) xpathToSchemaElements.selectNodes(document));
+        
+        
+        
+        for (Element e : siardSchemas) {
+        	System.out.println(e.getName());
+        }*/
+        
+		return siardDocuments;
 	}
 	
 	//Setter and getter methods
@@ -327,13 +362,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		this.xsdNamespace = xsdNamespace;
 	}
 
-	public String getPathToMetadataXML() {
-		return pathToMetadataXML;
-	}
-
-	public void setPathToMetadataXML(String pathToMetadataXML) {
-		this.pathToMetadataXML = pathToMetadataXML;
-	}
+	
 
 	public List<Element> getXmlElements() {
 		return xmlElements;
@@ -357,6 +386,30 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 
 	public void setSiardSchemas(List<Element> siardSchemas) {
 		this.siardSchemas = siardSchemas;
+	}
+
+	public HashMap<String, File> getSiardFiles() {
+		return siardFiles;
+	}
+
+	public void setSiardFiles(HashMap<String, File> siardFiles) {
+		this.siardFiles = siardFiles;
+	}
+
+	public HashMap<String, Document> getSiardDocuments() {
+		return siardDocuments;
+	}
+
+	public void setSiardDocuments(HashMap<String, Document> siardDocuments) {
+		this.siardDocuments = siardDocuments;
+	}
+
+	public File getMetadataXML() {
+		return metadataXML;
+	}
+
+	public void setMetadataXML(File metadataXML) {
+		this.metadataXML = metadataXML;
 	}
 
 }
