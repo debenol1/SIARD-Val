@@ -278,7 +278,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
  }
  
  private HashMap<String, Document> buildDocuments(File metadataXML, Properties properties)
-   throws JDOMException, FileNotFoundException, IOException {
+   throws JDOMException, FileNotFoundException, IOException,JaxenException {
   
   //Initialize the empty HashMap
   HashMap<String, Document> siardDocuments = new HashMap<String, Document>();
@@ -303,7 +303,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         //Build JDOM Documents for all referenced table.xsd schemata
         String pathToSchemaElements = properties.getProperty("xpath.to.siard.schemas");
         
-        
+      	JDOMXPath xpath = new JDOMXPath(pathToSchemaElements);
+		
         /*PathFactoryctory = XPathFactory.instance();
         XPathExpression xPathExpression =*/ 
       
