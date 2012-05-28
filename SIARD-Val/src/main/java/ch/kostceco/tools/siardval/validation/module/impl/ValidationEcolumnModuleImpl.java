@@ -6,15 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
 import org.jdom2.*;
-import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.*;
+
 import ch.enterag.utils.zip.EntryInputStream;
 import ch.enterag.utils.zip.FileEntry;
 import ch.enterag.utils.zip.Zip64File;
@@ -35,7 +33,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*Content of the SIARD package*/
 	private HashMap<String, File> siardFiles;
 	private File metadataXML;
-	private String contentPath;
+	private String contentPath; 
 	private String headerPath;
 	
 	/*SIARD XML processing related properties*/
@@ -69,6 +67,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		 try {
 		  
 			 //Initialize the validation context
+			 
 			 prepareValidation(siardDatei);
 	  
 			 //Validates the number of the attributes
@@ -118,13 +117,31 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	  return valid;
 	}
 	
-	private boolean prepareValidation(File siardFile) throws IOException {
+	private boolean prepareValidation(File siardFile) throws IOException, JDOMException {
 		
-		boolean prepared = false;
+		boolean prepared = true;
 		
 		boolean propertiesLoaded = initializeProperties();
-		boolean pathInitilized = initializePath(this.getValidationProperties());
-		boolean xmlAcccessPrepared = prepareXMLAccess(this.getValidationProperties());
+		boolean pathInitialized = initializePath(this.getValidationProperties());
+		System.out.println("Debug");
+		
+		
+		boolean siardArchiveExtracted = extractSiardArchive(siardFile);
+		
+		boolean metadataXMLpicked = pickMetadataXML(this.getValidationProperties());
+		
+		boolean xmlAcccessPrepared = prepareXMLAccess(this.getValidationProperties(), this.getMetadataXML());
+		
+		boolean validationDataPrepared = prepareValidationData(this.getValidationProperties(), this.getMetadataXML());
+		
+		if (propertiesLoaded == true &&
+				pathInitialized == true &&
+				xmlAcccessPrepared == true &&
+				siardArchiveExtracted == true &&
+				metadataXMLpicked == true && 
+				validationDataPrepared == true) {
+			prepared = true;
+		}
 		
 		return prepared;
 	}
@@ -205,7 +222,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					Element xsdElement = xsdElements.get(i);
 				 
 					String xmlTypeElementName = properties.getProperty("siard.metadata.xml.type.element.name");
-					String xmlNameElementName = properties.getProperty("siard.metadata.xml.name.element.name");
+					//String xmlNameElementName = properties.getProperty("siard.metadata.xml.name.element.name");
 					String xsdTypeAttributeName = properties.getProperty("siard.table.xsd.type.attribute.name");
 						
 					//Check the nullable Element
@@ -317,26 +334,38 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		 
 		 
 		 
-	private boolean prepareXMLAccess(Properties properties) {
+	private boolean prepareXMLAccess(Properties properties, File metadataXML) throws JDOMException, IOException {
 		
 		boolean successfullyCommitted = false;
-		   
+		
+		InputStream inputStream = new FileInputStream(metadataXML);
+  		SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(inputStream);
+        
+        Element rootElement = document.getRootElement();
+
+		String namespaceURI = rootElement.getNamespaceURI();
+				
+		String xmlPrefix = properties.getProperty("metadata.xml.prefix");
+		String xsdPrefix = properties.getProperty("table.xsd.prefix");
+		
+			
+		
 		//Setting the namespaces to access metadata.xml and the different table.xsd
 		Namespace xmlNamespace = Namespace.getNamespace(xmlPrefix, namespaceURI);
 		Namespace xsdNamespace = Namespace.getNamespace(xsdPrefix, namespaceURI);
 		       
-		//Assigning namespace info to the validation context
-		this.setXmlNamespace(xmlNamespace);
-		this.setXsdNamespace(xsdNamespace);
-		       
-		//Setting the XML prefix to access metadata.xml and the different table.xsd
-		//The prefices are stored in validation.properties
-		String xmlPrefix = properties.getProperty("metadata.xml.prefix");
-		String xsdPrefix = properties.getProperty("table.xsd.prefix");
+		
 		       
 		//Assigning prefix to the validation context
 		this.setXmlPrefix(xmlPrefix);
 		this.setXsdPrefix(xsdPrefix);
+		
+		
+	    
+		//Assigning namespace info to the validation context
+		this.setXmlNamespace(xmlNamespace);
+		this.setXsdNamespace(xsdNamespace);
 		
 		if ( this.getXmlNamespace() != null &&
 			 this.getXsdNamespace() != null &&
@@ -358,6 +387,96 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			return leftside;
 		}
 	}
+	
+    private boolean extractSiardArchive(File packedSiardArchive)
+			   throws FileNotFoundException, IOException {
+    	
+    	boolean sucessfullyCommitted = false;
+			      
+		Zip64File zipfile = new Zip64File(packedSiardArchive);
+		List<FileEntry> fileEntryList = zipfile.getListFileEntries();
+			       
+		String pathToWorkDir = getConfigurationService().getPathToWorkDir();
+		File tmpDir = new File(pathToWorkDir);
+			       
+		HashMap<String, File> extractedSiardFiles = new HashMap<String, File>();
+			       
+		for (FileEntry fileEntry : fileEntryList) {
+			if (!fileEntry.isDirectory()) {
+				
+				byte[] buffer = new byte[8192];
+			    EntryInputStream eis = zipfile.openEntryInputStream(fileEntry.getName());
+			               
+			    File newFile = new File(tmpDir, fileEntry.getName());
+			    File parent = newFile.getParentFile();
+			               
+			    if (!parent.exists()) {
+			    	parent.mkdirs();
+			    }
+			               
+			    FileOutputStream fos = new FileOutputStream(newFile);
+			               
+			    for (int iRead = eis.read(buffer); iRead >= 0; iRead = eis.read(buffer)){
+			    	fos.write(buffer, 0, iRead);
+			    }
+			               
+			    extractedSiardFiles.put(newFile.getPath(), newFile);
+			    
+			    eis.close();
+			    fos.close();                
+			}
+		}
+		
+		this.setSiardFiles(extractedSiardFiles);
+		
+		if (this.getSiardFiles() != null) {
+			sucessfullyCommitted = true;
+		}
+		
+		return sucessfullyCommitted;
+	}
+			 
+	private boolean pickMetadataXML (Properties properties) {
+		
+		boolean successfullyCommitted = false;
+		
+		HashMap<String, File> siardFiles = this.getSiardFiles();
+		String pathToMetadataXML = this.getConfigurationService().getPathToWorkDir();
+			  
+		pathToMetadataXML = pathToMetadataXML+properties.getProperty("siard.description");
+		File metadataXML = siardFiles.get(pathToMetadataXML);
+		
+		this.setMetadataXML(metadataXML);
+		
+		if (this.getMetadataXML() != null) {
+			successfullyCommitted = true;
+		}
+		return successfullyCommitted;
+			  
+	}
+	
+	private boolean prepareValidationData(Properties properties, File metadataXML) throws JDOMException, IOException {
+		
+		boolean successfullyCommitted = true;
+		
+		InputStream inputStream = new FileInputStream(metadataXML);
+  		SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(inputStream);
+        
+        Element rootElement = document.getRootElement();
+        
+        String siardSchemasElementsName = properties.getProperty("siard.metadata.xml.schemas.name");
+        
+        Element siardSchemasElement = rootElement.getChild(siardSchemasElementsName, this.getXmlNamespace());
+        
+        System.out.println("1: " + siardSchemasElement.getValue());
+        
+		
+		return successfullyCommitted;
+		
+	}
+	
+	
 	
 	//Setter and Getter methods
 	/**
