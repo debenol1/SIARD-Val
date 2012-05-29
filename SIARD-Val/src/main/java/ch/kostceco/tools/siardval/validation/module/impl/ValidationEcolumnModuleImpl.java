@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +34,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*Content of the SIARD package*/
 	private HashMap<String, File> siardFiles;
 	private File metadataXML;
+	private Document metadataXMLDocument;
 	private String contentPath; 
 	private String headerPath;
 	
@@ -122,9 +124,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		boolean prepared = true;
 		
 		boolean propertiesLoaded = initializeProperties();
-		boolean pathInitialized = initializePath(this.getValidationProperties());
-		System.out.println("Debug");
 		
+		boolean pathInitialized = initializePath(this.getValidationProperties());
 		
 		boolean siardArchiveExtracted = extractSiardArchive(siardFile);
 		
@@ -342,27 +343,23 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
   		SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(inputStream);
         
-        Element rootElement = document.getRootElement();
-
-		String namespaceURI = rootElement.getNamespaceURI();
-				
+        //Assigning JDOM Document to the validation context
+        this.setMetadataXMLDocument(document);
+        				
 		String xmlPrefix = properties.getProperty("metadata.xml.prefix");
 		String xsdPrefix = properties.getProperty("table.xsd.prefix");
-		
 			
-		
 		//Setting the namespaces to access metadata.xml and the different table.xsd
+		Element rootElement = document.getRootElement();
+		String namespaceURI = rootElement.getNamespaceURI();
+		
 		Namespace xmlNamespace = Namespace.getNamespace(xmlPrefix, namespaceURI);
 		Namespace xsdNamespace = Namespace.getNamespace(xsdPrefix, namespaceURI);
-		       
-		
 		       
 		//Assigning prefix to the validation context
 		this.setXmlPrefix(xmlPrefix);
 		this.setXsdPrefix(xsdPrefix);
-		
-		
-	    
+			    
 		//Assigning namespace info to the validation context
 		this.setXmlNamespace(xmlNamespace);
 		this.setXsdNamespace(xsdNamespace);
@@ -370,7 +367,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		if ( this.getXmlNamespace() != null &&
 			 this.getXsdNamespace() != null &&
 			 this.getXmlPrefix() != null &&
-			 this.getXsdPrefix() != null ) {
+			 this.getXsdPrefix() != null &&
+			 this.getMetadataXMLDocument() != null) {
 			successfullyCommitted = true;
 		}
 		return successfullyCommitted;
@@ -459,17 +457,59 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		
 		boolean successfullyCommitted = true;
 		
-		InputStream inputStream = new FileInputStream(metadataXML);
-  		SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(inputStream);
+		List<SiardTable> siardTables = new ArrayList<SiardTable>();
+		
+		Document document = this.getMetadataXMLDocument();
         
         Element rootElement = document.getRootElement();
-        
+        String workingDirectory = this.getConfigurationService().getPathToWorkDir();        
         String siardSchemasElementsName = properties.getProperty("siard.metadata.xml.schemas.name");
+        List<Element> siardSchemasElements = rootElement.getChildren(siardSchemasElementsName, this.getXmlNamespace());
         
-        Element siardSchemasElement = rootElement.getChild(siardSchemasElementsName, this.getXmlNamespace());
+        for (Element siardSchemasElement : siardSchemasElements) {
+        	
+        	List<Element> siardSchemaElements = siardSchemasElement.getChildren(properties.getProperty("siard.metadata.xml.schema.name"), this.getXmlNamespace());
+        	
+        	for (Element siardSchemaElement : siardSchemaElements) {
+        		
+        		String schemaFolderName = siardSchemaElement.getChild(properties.getProperty("siard.metadata.xml.schema.folder.name"), this.getXmlNamespace()).getValue();
+        		
+        		
+        		Element siardTablesElement = siardSchemaElement.getChild(properties.getProperty("siard.metadata.xml.tables.name"), this.getXmlNamespace());
+        		
+        		List<Element> siardTableElements = siardTablesElement.getChildren(properties.getProperty("siard.metadata.xml.table.name"), this.getXmlNamespace());
+        		
+        		for (Element siardTableElement : siardTableElements) {
+        			
+        			Element siardColumnsElement = siardTableElement.getChild(properties.getProperty("siard.metadata.xml.columns.name"), this.getXmlNamespace());
+        			
+        			List<Element> siardColumnElements = siardColumnsElement.getChildren(properties.getProperty("siard.metadata.xml.column.name"), this.getXmlNamespace());
+        			
+        			SiardTable siardTable = new SiardTable();
+        			siardTable.setMetadataXMLElements(siardColumnElements);
+        			siardTables.add(siardTable);
+        			
+        			String siardTableFolderName = siardTableElement.getChild(properties.getProperty("siard.metadata.xml.table.folder.name"), this.getXmlNamespace()).getValue();
+        			
+        			System.out.println(workingDirectory + "/" + properties.getProperty("siard.path.to.content") + "/" + schemaFolderName + "/" + siardTableFolderName + "/" + siardTableFolderName + properties.getProperty("siard.table.xsd.file.extension"));
+        		
+        			String path = workingDirectory + "/" + properties.getProperty("siard.path.to.content") + "/" + schemaFolderName + "/" + siardTableFolderName + "/" + siardTableFolderName + properties.getProperty("siard.table.xsd.file.extension");
+        		
+        			File file = this.getSiardFiles().get(path);
+        			
+        			System.out.println(file.getName());
+        		
+        		}
+        		
+        		
+        	}
+        	
+        }
         
-        System.out.println("1: " + siardSchemasElement.getValue());
+        
+        for (SiardTable siardTable : siardTables) {
+        	System.out.println(siardTable.getMetadataXMLElements().size());
+        }
         
 		
 		return successfullyCommitted;
@@ -701,6 +741,14 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	 */
 	public void setSiardTables(List<SiardTable> siardTables) {
 		this.siardTables = siardTables;
+	}
+
+	public Document getMetadataXMLDocument() {
+		return metadataXMLDocument;
+	}
+
+	public void setMetadataXMLDocument(Document metadataXMLDocument) {
+		this.metadataXMLDocument = metadataXMLDocument;
 	}
  
 	
