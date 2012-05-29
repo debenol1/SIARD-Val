@@ -133,7 +133,17 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		
 		boolean xmlAcccessPrepared = prepareXMLAccess(this.getValidationProperties(), this.getMetadataXML());
 		
+		
+		
 		boolean validationDataPrepared = prepareValidationData(this.getValidationProperties(), this.getMetadataXML());
+		
+		System.out.println("propertiesLoaded: " + propertiesLoaded);
+		System.out.println("pathInitialized: " + pathInitialized);
+		System.out.println("siardArchiveExtracted: " + siardArchiveExtracted);
+		System.out.println("metadataXMLpicked: " + metadataXMLpicked);
+		System.out.println("xmlAcccessPrepared: " + xmlAcccessPrepared);
+		System.out.println("validationDataPrepared: " + validationDataPrepared);
+		
 		
 		if (propertiesLoaded == true &&
 				pathInitialized == true &&
@@ -150,6 +160,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeCount(List<SiardTable> siardTables) {
 		
 		boolean valid = true;
+		
+		System.out.println("validateAttributeCount");
 		 
 		for (SiardTable siardTable : siardTables) {
 			
@@ -166,6 +178,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, Properties properties) {
 		
 		boolean valid = true;
+		
+		System.out.println("validateAttributeOccurrence");
 		
 		for (SiardTable siardTable : siardTables) {
 			
@@ -209,6 +223,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeType(List<SiardTable> siardTables, Properties properties) {
 		
 		boolean valid = true;
+		
+		System.out.println("validateAttributeType");
 		
 		for (SiardTable siardTable : siardTables) {
 		
@@ -259,6 +275,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeSequence() {
 		
 		boolean valid = true;
+		
+		System.out.println("validateAttributeSequence");
 	
 		List<String> xmlTypesSequence = this.getXmlElementsSequence();
 		List<String> xsdTypesSequence = this.getXsdelementsSequence();
@@ -455,7 +473,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	
 	private boolean prepareValidationData(Properties properties, File metadataXML) throws JDOMException, IOException {
 		
-		boolean successfullyCommitted = true;
+		boolean successfullyCommitted = false;
 		
 		List<SiardTable> siardTables = new ArrayList<SiardTable>();
 		
@@ -474,7 +492,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         		
         		String schemaFolderName = siardSchemaElement.getChild(properties.getProperty("siard.metadata.xml.schema.folder.name"), this.getXmlNamespace()).getValue();
         		
-        		
         		Element siardTablesElement = siardSchemaElement.getChild(properties.getProperty("siard.metadata.xml.tables.name"), this.getXmlNamespace());
         		
         		List<Element> siardTableElements = siardTablesElement.getChildren(properties.getProperty("siard.metadata.xml.table.name"), this.getXmlNamespace());
@@ -485,20 +502,49 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         			
         			List<Element> siardColumnElements = siardColumnsElement.getChildren(properties.getProperty("siard.metadata.xml.column.name"), this.getXmlNamespace());
         			
+        			String tableName = siardTableElement.getChild(properties.getProperty("siard.metadata.xml.table.folder.name"), this.getXmlNamespace()).getValue();
+        			
         			SiardTable siardTable = new SiardTable();
         			siardTable.setMetadataXMLElements(siardColumnElements);
-        			siardTables.add(siardTable);
+        			siardTable.setTableName(tableName);
         			
         			String siardTableFolderName = siardTableElement.getChild(properties.getProperty("siard.metadata.xml.table.folder.name"), this.getXmlNamespace()).getValue();
         			
-        			System.out.println(workingDirectory + "/" + properties.getProperty("siard.path.to.content") + "/" + schemaFolderName + "/" + siardTableFolderName + "/" + siardTableFolderName + properties.getProperty("siard.table.xsd.file.extension"));
-        		
-        			String path = workingDirectory + "/" + properties.getProperty("siard.path.to.content") + "/" + schemaFolderName + "/" + siardTableFolderName + "/" + siardTableFolderName + properties.getProperty("siard.table.xsd.file.extension");
-        		
-        			File file = this.getSiardFiles().get(path);
+        		    StringBuilder pathToTableSchema = new StringBuilder();
+        		    
+        		    pathToTableSchema.append(workingDirectory);
+        		    pathToTableSchema.append("/");
+        		    pathToTableSchema.append(properties.getProperty("siard.path.to.content"));
+        		    pathToTableSchema.append("/");
+        		    pathToTableSchema.append(schemaFolderName);
+        		    pathToTableSchema.append("/");
+        		    pathToTableSchema.append(siardTableFolderName);
+        		    pathToTableSchema.append("/");
+        		    pathToTableSchema.append(siardTableFolderName);
+        		    pathToTableSchema.append(properties.getProperty("siard.table.xsd.file.extension"));
         			
-        			System.out.println(file.getName());
+        			File tableSchema = this.getSiardFiles().get(pathToTableSchema.toString());
+        			
+        	  		SAXBuilder builder = new SAXBuilder();
+        			Document tableSchemaDocument = builder.build(tableSchema);
+        			
+        			
+        			Element tableSchemaRootElement = tableSchemaDocument.getRootElement();
+        			Namespace namespace = tableSchemaRootElement.getNamespace();
         		
+        			Element tableSchemaComplexType = tableSchemaRootElement.getChild(properties.getProperty("siard.table.xsd.complexType"), namespace);
+        			Element tableSchemaComplexTypeSequence = tableSchemaComplexType.getChild(properties.getProperty("siard.table.xsd.sequence"), namespace);
+        			
+        			List<Element> tableSchemaComplexTypeElements = tableSchemaComplexTypeSequence.getChildren(properties.getProperty("siard.table.xsd.element"), namespace);
+        			
+        			/*for (Element tableSchemaComplexTypeElement : tableSchemaComplexTypeElements) {
+        				System.out.print(tableSchemaComplexTypeElement.getAttributeValue("minOccurs"));
+        				System.out.print(tableSchemaComplexTypeElement.getAttributeValue("name"));
+        				System.out.println(tableSchemaComplexTypeElement.getAttributeValue("type"));
+        			}*/
+        			siardTable.setTableXSDElements(tableSchemaComplexTypeElements);
+        			siardTables.add(siardTable);
+        			this.setSiardTables(siardTables);
         		}
         		
         		
@@ -507,8 +553,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         }
         
         
-        for (SiardTable siardTable : siardTables) {
-        	System.out.println(siardTable.getMetadataXMLElements().size());
+        if (this.getSiardTables() != null) {
+        	successfullyCommitted = true;
         }
         
 		
