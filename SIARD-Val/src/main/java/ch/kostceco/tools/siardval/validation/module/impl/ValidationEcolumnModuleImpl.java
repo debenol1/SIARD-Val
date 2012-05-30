@@ -63,14 +63,21 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		 //Validation Java properties
 		 Properties properties = this.getValidationProperties();
 		 
-		 //Validation data
-		 List<SiardTable> siardTables = this.getSiardTables();
+		 
 	  
 		 try {
 		  
 			 //Initialize the validation context
+			 if (prepareValidation(siardDatei) == false) {
+				 valid = false;
+				 getMessageService().logInfo(
+	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
+	                     getTextResourceService().getText(MESSAGE_DASHES) +
+	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT));
+			 }
 			 
-			 prepareValidation(siardDatei);
+			//Validation data
+			 List<SiardTable> siardTables = this.getSiardTables();
 	  
 			 //Validates the number of the attributes
 			 if (validateAttributeCount(siardTables) == false) {
@@ -132,19 +139,9 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		boolean metadataXMLpicked = pickMetadataXML(this.getValidationProperties());
 		
 		boolean xmlAcccessPrepared = prepareXMLAccess(this.getValidationProperties(), this.getMetadataXML());
-		
-		
-		
+				
 		boolean validationDataPrepared = prepareValidationData(this.getValidationProperties(), this.getMetadataXML());
-		
-		System.out.println("propertiesLoaded: " + propertiesLoaded);
-		System.out.println("pathInitialized: " + pathInitialized);
-		System.out.println("siardArchiveExtracted: " + siardArchiveExtracted);
-		System.out.println("metadataXMLpicked: " + metadataXMLpicked);
-		System.out.println("xmlAcccessPrepared: " + xmlAcccessPrepared);
-		System.out.println("validationDataPrepared: " + validationDataPrepared);
-		
-		
+			
 		if (propertiesLoaded == true &&
 				pathInitialized == true &&
 				xmlAcccessPrepared == true &&
@@ -160,14 +157,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeCount(List<SiardTable> siardTables) {
 		
 		boolean valid = true;
-		
-		System.out.println("validateAttributeCount");
-		 
+	    
 		for (SiardTable siardTable : siardTables) {
 			
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
-		 
+			
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
 				valid = true;
 			}
@@ -179,31 +174,47 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		
 		boolean valid = true;
 		
-		System.out.println("validateAttributeOccurrence");
-		
 		for (SiardTable siardTable : siardTables) {
+			
+			
 			
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
+			
+			
+			
 		 
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
 			 
 				List<Element> xmlElements = siardTable.getMetadataXMLElements();
 				List<Element> xsdElements = siardTable.getTableXSDElements();
-			 
+							 
 				Namespace xmlNamespace = this.getXmlNamespace();
 				Namespace xsdNamespace = this.getXsdNamespace();
-			 
+				
+				
+									 
 				for ( int i = 0; i < metadataXMLColumnsCount; i++) {
-				 
+					
+					
+					
+					
 					Element xmlElement = xmlElements.get(i);
 					Element xsdElement = xsdElements.get(i);
+								
 				 
-					String nullableElementDescription = properties.getProperty("metadata.xml.nullable");
-					String minuOccursAttributeDescription = properties.getProperty("table.xsd.attribute.minOccurs.name");
+					String nullableElementDescription = properties.getProperty("siard.metadata.xml.nullable.element.name");
+					
+					//String minuOccursAttributeDescription = properties.getProperty("siard.table.xsd.attribute.minOccurs.name");
+					
+					System.out.println(nullableElementDescription);
+					
+					
 				 
 					String nullable = xmlElement.getChild(nullableElementDescription, xmlNamespace).getValue();
-					String minOccurs = xsdElement.getAttributeValue(minuOccursAttributeDescription, xsdNamespace);
+					//String minOccurs = xsdElement.getAttributeValue(minuOccursAttributeDescription, xsdNamespace);
+					
+					System.out.println("blabla");
 				 
 					if (nullable.equalsIgnoreCase("true") && minOccurs == null) {
 						valid = false;
@@ -216,7 +227,9 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			} else {
 				valid = false;
 			}
+			
 		}
+		
 		return valid;
 	}
 	
@@ -473,9 +486,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	
 	private boolean prepareValidationData(Properties properties, File metadataXML) throws JDOMException, IOException {
 		
+		
+		
 		boolean successfullyCommitted = false;
 		
 		List<SiardTable> siardTables = new ArrayList<SiardTable>();
+		
+		
 		
 		Document document = this.getMetadataXMLDocument();
         
@@ -498,11 +515,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         		
         		for (Element siardTableElement : siardTableElements) {
         			
+        			
         			Element siardColumnsElement = siardTableElement.getChild(properties.getProperty("siard.metadata.xml.columns.name"), this.getXmlNamespace());
         			
         			List<Element> siardColumnElements = siardColumnsElement.getChildren(properties.getProperty("siard.metadata.xml.column.name"), this.getXmlNamespace());
         			
         			String tableName = siardTableElement.getChild(properties.getProperty("siard.metadata.xml.table.folder.name"), this.getXmlNamespace()).getValue();
+        			
         			
         			SiardTable siardTable = new SiardTable();
         			siardTable.setMetadataXMLElements(siardColumnElements);
@@ -516,13 +535,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         		    pathToTableSchema.append("/");
         		    pathToTableSchema.append(properties.getProperty("siard.path.to.content"));
         		    pathToTableSchema.append("/");
-        		    pathToTableSchema.append(schemaFolderName);
+        		    pathToTableSchema.append(schemaFolderName.replaceAll(" ", ""));
         		    pathToTableSchema.append("/");
-        		    pathToTableSchema.append(siardTableFolderName);
+        		    pathToTableSchema.append(siardTableFolderName.replaceAll(" ", ""));
         		    pathToTableSchema.append("/");
-        		    pathToTableSchema.append(siardTableFolderName);
+        		    pathToTableSchema.append(siardTableFolderName.replaceAll(" ", ""));
         		    pathToTableSchema.append(properties.getProperty("siard.table.xsd.file.extension"));
-        			
+        		           			
         			File tableSchema = this.getSiardFiles().get(pathToTableSchema.toString());
         			
         	  		SAXBuilder builder = new SAXBuilder();
@@ -537,29 +556,17 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         			
         			List<Element> tableSchemaComplexTypeElements = tableSchemaComplexTypeSequence.getChildren(properties.getProperty("siard.table.xsd.element"), namespace);
         			
-        			/*for (Element tableSchemaComplexTypeElement : tableSchemaComplexTypeElements) {
-        				System.out.print(tableSchemaComplexTypeElement.getAttributeValue("minOccurs"));
-        				System.out.print(tableSchemaComplexTypeElement.getAttributeValue("name"));
-        				System.out.println(tableSchemaComplexTypeElement.getAttributeValue("type"));
-        			}*/
         			siardTable.setTableXSDElements(tableSchemaComplexTypeElements);
         			siardTables.add(siardTable);
         			this.setSiardTables(siardTables);
-        		}
-        		
-        		
+        				
+        		}		
         	}
-        	
         }
-        
-        
         if (this.getSiardTables() != null) {
         	successfullyCommitted = true;
         }
-        
-		
 		return successfullyCommitted;
-		
 	}
 	
 	
