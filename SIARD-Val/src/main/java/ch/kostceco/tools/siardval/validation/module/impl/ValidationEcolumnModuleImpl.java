@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +44,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private List<Element> xsdElements;
 	
 	private List<String> xmlElementsSequence;
-	private List<String> xsdelementsSequence;
+	private List<String> xsdElementsSequence;
 	
 	private List<SiardTable> siardTables;
  
@@ -51,22 +52,22 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private String namespaceURI;
 	private String xmlPrefix;
 	private String xsdPrefix;
+	
 	private Namespace xmlNamespace;
 	private Namespace xsdNamespace;
   
+	/*Logging information*/
+	private StringBuilder validationLog;
+	
+	
+	@SuppressWarnings("finally")
 	@Override
 	public boolean validate(File siardDatei) throws ValidationEcolumnException {
 		
 		 //All over validation flag
 		 boolean valid = true;
-		 
-		 //Validation Java properties
-		 Properties properties = this.getValidationProperties();
-		 
-		 
-	  
+		 		 	   
 		 try {
-		  
 			 //Initialize the validation context
 			 if (prepareValidation(siardDatei) == false) {
 				 valid = false;
@@ -76,54 +77,75 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT));
 			 }
 			 
-			//Validation data
+			 //Get the prepared SIARD tables from the validation context
 			 List<SiardTable> siardTables = this.getSiardTables();
-	  
-			 //Validates the number of the attributes
-			 if (validateAttributeCount(siardTables) == false) {
+			 
+			 //Get the Java properties from the validation context
+			 Properties properties = this.getValidationProperties();
+			 
+			 if (properties == null) {
 				 valid = false;
 				 getMessageService().logInfo(
 	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                     getTextResourceService().getText(MESSAGE_DASHES) +
-	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT));
+	                     getTextResourceService().getText(MESSAGE_MODULE_E_MISSING_PROPERTIES));
+				
 			 }
-	  
+			 
+			 if (siardTables == null) {
+				 valid = false;
+				 getMessageService().logInfo(
+	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
+	                     getTextResourceService().getText(MESSAGE_DASHES) +
+	                     getTextResourceService().getText(MESSAGE_MODULE_E_MISSING_SIARD_TABLES));
+			 }
+			 			 
+			 //Validates the number of the attributes
+			 if (validateAttributeCount(siardTables, properties) == false) {
+				 valid = false;
+					 getMessageService().logInfo(
+	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
+	                 getTextResourceService().getText(MESSAGE_DASHES) +
+	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT));
+			 }
+			 			 
 			 //Validates the nullable property in metadata.xml
 			 if (validateAttributeOccurrence(siardTables, properties) == false) {
-				 valid = false;
-				 getMessageService().logInfo(
-	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
-	                     getTextResourceService().getText(MESSAGE_DASHES) +
-	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE));
+				valid = false;
+					 getMessageService().logInfo(
+	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
+	                 getTextResourceService().getText(MESSAGE_DASHES) +
+	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE));
 			 }
-	  
-			 //Validates the sequence of table attributes in metadata.xml
-			 if (validateAttributeSequence() == false) {
-				 valid = false;
-				 getMessageService().logInfo(
-	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
-	                     getTextResourceService().getText(MESSAGE_DASHES) +
-	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE));
-			 }
-	  
+			 
 			 //Validates the type of table attributes in metadata.xml
 			 if (validateAttributeType(siardTables, properties) == false) {
-				 valid = false;
-				 getMessageService().logInfo(
-	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
-	                     getTextResourceService().getText(MESSAGE_DASHES) +
-	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE));
+				valid = false;
+					 getMessageService().logInfo(
+	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
+	                 getTextResourceService().getText(MESSAGE_DASHES) +
+	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE));
 			 }	
+	         
+			 //Validates the sequence of table attributes in metadata.xml
+			 if (validateAttributeSequence() == false) {
+				valid = false;
+					getMessageService().logInfo(
+	                getTextResourceService().getText(MESSAGE_MODULE_E) +
+	                getTextResourceService().getText(MESSAGE_DASHES) +
+	                getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE));
+			 }
 			 
-		 } catch (Exception je) {
-	   valid = false;
-	   getMessageService().logError(
-	                    getTextResourceService().getText(MESSAGE_MODULE_E) +
-	                    getTextResourceService().getText(MESSAGE_DASHES) +
-	                    "JaxenException " +
-	                    je.getMessage());
-	  }
-	  return valid;
+			 System.out.println(this.getValidationLog().toString());
+	         			 
+		} catch (Exception je) {
+			valid = false;
+			getMessageService().logError(
+				getTextResourceService().getText(MESSAGE_MODULE_E) +
+	            getTextResourceService().getText(MESSAGE_DASHES) + je.getMessage());
+		} finally {
+		 return valid;
+		}
 	}
 	
 	private boolean prepareValidation(File siardFile) throws IOException, JDOMException {
@@ -139,9 +161,9 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		boolean metadataXMLpicked = pickMetadataXML(this.getValidationProperties());
 		
 		boolean xmlAcccessPrepared = prepareXMLAccess(this.getValidationProperties(), this.getMetadataXML());
-				
+		
 		boolean validationDataPrepared = prepareValidationData(this.getValidationProperties(), this.getMetadataXML());
-			
+		
 		if (propertiesLoaded == true &&
 				pathInitialized == true &&
 				xmlAcccessPrepared == true &&
@@ -149,27 +171,62 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 				metadataXMLpicked == true && 
 				validationDataPrepared == true) {
 			prepared = true;
+			
 		}
 		
 		return prepared;
 	}
 	
-	private boolean validateAttributeCount(List<SiardTable> siardTables) {
+	//[E.1]
+	private boolean validateAttributeCount(List<SiardTable> siardTables, Properties properties) throws Exception {
 		
 		boolean valid = true;
+		
+		//Initializing validation Logging
+		StringBuilder validationLog = new StringBuilder();
+		
+		String methodTitle = properties.
+				getProperty("attribute.count.validator");
+		
+		String methodDescription = properties.
+				getProperty("attribute.count.validator.description");
+		
+		validationLog.append(methodTitle);
+		validationLog.append(methodDescription);
 	    
+		//Iteratic over all SIARD tables to count the table attributes
+		//and compare it to the number of registered attributes in the according XML schemas
 		for (SiardTable siardTable : siardTables) {
-			
+					
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
 			
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
 				valid = true;
 			}
+			
+			//Preparing validation log entry
+			String validationLogSceleton = properties.
+					getProperty("attribute.count.validator.log.entry");
+			
+			String validationLogEntry = MessageFormat.
+					format(validationLogSceleton, 
+						   siardTable.getTableName(), 
+						   metadataXMLColumnsCount,
+						   tableXSDColumnsCount);
+			
+			validationLog.append(validationLogEntry);
+			validationLog.append(properties.getProperty("newline"));
 		}
+		
+		//Write the local validation log to the validation context
+		this.setValidationLog(validationLog);
+		
+		//Return the current validation state
 		return valid;
 	}
 	
+	//[E.2]
 	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, Properties properties) {
 		
 		boolean valid = true;
@@ -185,7 +242,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			
 		 
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
-			 
+				
 				List<Element> xmlElements = siardTable.getMetadataXMLElements();
 				List<Element> xsdElements = siardTable.getTableXSDElements();
 							 
@@ -201,20 +258,17 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					
 					Element xmlElement = xmlElements.get(i);
 					Element xsdElement = xsdElements.get(i);
-								
-				 
+					
 					String nullableElementDescription = properties.getProperty("siard.metadata.xml.nullable.element.name");
 					
-					//String minuOccursAttributeDescription = properties.getProperty("siard.table.xsd.attribute.minOccurs.name");
-					
-					System.out.println(nullableElementDescription);
+					String minuOccursAttributeDescription = properties.getProperty("siard.table.xsd.attribute.minOccurs.name");
 					
 					
 				 
 					String nullable = xmlElement.getChild(nullableElementDescription, xmlNamespace).getValue();
-					//String minOccurs = xsdElement.getAttributeValue(minuOccursAttributeDescription, xsdNamespace);
+					String minOccurs = xsdElement.getAttributeValue(minuOccursAttributeDescription);
 					
-					System.out.println("blabla");
+					//System.out.println(nullable + ", " + minOccurs + ", " + xsdNamespace.getURI() + ", " + properties.getProperty("siard.table.xsd.attribute.minOccurs.name"));
 				 
 					if (nullable.equalsIgnoreCase("true") && minOccurs == null) {
 						valid = false;
@@ -237,42 +291,51 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		
 		boolean valid = true;
 		
-		System.out.println("validateAttributeType");
+		List<String> xmlElementSequence = new ArrayList<String>();
+		List<String> xsdElementSequence = new ArrayList<String>();
 		
 		for (SiardTable siardTable : siardTables) {
-		
+			
 			List<Element> xmlElements = siardTable.getMetadataXMLElements();
 			List<Element> xsdElements = siardTable.getTableXSDElements();
 		 	
 			if (xmlElements.size() == xsdElements.size()) {
-		
+				
+				
+				
 				for ( int i = 0; i < xmlElements.size(); i++ ) {
-						
+					
 					Element xmlElement = xmlElements.get(i);
 					Element xsdElement = xsdElements.get(i);
-				 
+					
+					
+					
 					String xmlTypeElementName = properties.getProperty("siard.metadata.xml.type.element.name");
 					//String xmlNameElementName = properties.getProperty("siard.metadata.xml.name.element.name");
 					String xsdTypeAttributeName = properties.getProperty("siard.table.xsd.type.attribute.name");
-						
+					
 					//Check the nullable Element
 					String leftSide = xmlElement.getChild(xmlTypeElementName, this.getXmlNamespace()).getValue();
 						
 					//Check the minOccurs Attribute
 					String rightSide = xsdElement.getAttributeValue(xsdTypeAttributeName);
-						
+					
 					//?
 					//String elementName = xmlElement.getChild("name", this.getXmlNamespace()).getValue();
-						
-					String delimiter = properties.getProperty("attribute.type.validator.original.type.delimiter");
-						
+					
+					String delimiter = properties.getProperty("attribute.sequence.validator.original.type.delimiter");
+					
 					String trimmedExpectedType = trimLeftSideType(leftSide, delimiter);
+					
 					String expectedType = properties.getProperty(trimmedExpectedType);
-				
+					
+					
 					//All over list to check the sequence of all types
-					this.getXmlElementsSequence().add(expectedType);
-					this.getXsdelementsSequence().add(rightSide);
-				
+					
+					xmlElementSequence.add(expectedType);
+					xsdElementSequence.add(rightSide);
+					
+					
 					if (expectedType.equalsIgnoreCase(rightSide)) {
 					} else {
 						valid = false;
@@ -281,7 +344,15 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			} else {
 				valid = false;
 			}
-		}		
+		}
+		this.setXmlElementsSequence(xmlElementSequence);
+		this.setXsdElementsSequence(xsdElementSequence);
+		
+		if (this.getXmlElementsSequence() != null && this.getXsdElementsSequence() != null) {
+			valid = true;
+		}
+		
+		
 		return valid;
 	}
 	
@@ -289,28 +360,24 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		
 		boolean valid = true;
 		
-		System.out.println("validateAttributeSequence");
 	
 		List<String> xmlTypesSequence = this.getXmlElementsSequence();
-		List<String> xsdTypesSequence = this.getXsdelementsSequence();
-		 
+		List<String> xsdTypesSequence = this.getXsdElementsSequence();
 		int xmlTypesSequenceCount = xmlTypesSequence.size();
 		int xsdTypesSequenceCount = xsdTypesSequence.size();
-		 
 		if (xmlTypesSequenceCount == xsdTypesSequenceCount) {
-		 
 			for ( int i = 0; i < xmlTypesSequenceCount; i++ ) {
-			 
 				String xmlType = xmlTypesSequence.get(i);
 				String xsdType = xsdTypesSequence.get(i);
 				 
 				if ( !xmlType.equalsIgnoreCase(xsdType) ) {
-					valid = false;
+					valid = true;
 				}
 			}
 		} else {
 			valid = false;
 		}
+		
 		return valid; 
 	}
 	
@@ -701,15 +768,15 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/**
 	 * @return the xsdelementsSequence
 	 */
-	public List<String> getXsdelementsSequence() {
-		return xsdelementsSequence;
+	public List<String> getXsdElementsSequence() {
+		return xsdElementsSequence;
 	}
 
 	/**
 	 * @param xsdelementsSequence the xsdelementsSequence to set
 	 */
-	public void setXsdelementsSequence(List<String> xsdelementsSequence) {
-		this.xsdelementsSequence = xsdelementsSequence;
+	public void setXsdElementsSequence(List<String> xsdElementsSequence) {
+		this.xsdElementsSequence = xsdElementsSequence;
 	}
 
 	/**
@@ -803,10 +870,14 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	public void setMetadataXMLDocument(Document metadataXMLDocument) {
 		this.metadataXMLDocument = metadataXMLDocument;
 	}
- 
-	
-	
- 
+
+	public StringBuilder getValidationLog() {
+		return validationLog;
+	}
+
+	public void setValidationLog(StringBuilder validationLog) {
+		this.validationLog = validationLog;
+	}
 }
 
 

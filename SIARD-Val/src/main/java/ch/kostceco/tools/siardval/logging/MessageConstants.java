@@ -116,7 +116,9 @@ public interface MessageConstants {
     String MESSAGE_MODULE_E_MISSING_FOLDER               = "message.module.d.missing.folder";
     String MESSAGE_MODULE_E_INVALID_FILE                 = "message.module.d.invalid.file";
     String MESSAGE_MODULE_E_MISSING_FILE                 = "message.module.d.missing.file";
-    String MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT	 = "message.module.e,invalid.validation.context";
+    String MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT	 = "message.module.e.invalid.validation.context";
+    String MESSAGE_MODULE_E_MISSING_PROPERTIES			 = "message.module.e.missing.properties";
+    String MESSAGE_MODULE_E_MISSING_SIARD_TABLES		 = "message.module.e.missing.siard.tables";
     String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT      = "message.module.e.attribute.count.validation.failed";
     String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE = "message.module.e.attribute.occurrence.validation.failed";
     String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE   = "message.module.e.attribute.sequence.validation.failed";
