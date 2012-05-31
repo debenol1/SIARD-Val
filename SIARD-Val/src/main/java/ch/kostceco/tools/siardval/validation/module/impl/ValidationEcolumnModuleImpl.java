@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
-
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
-
 import ch.enterag.utils.zip.EntryInputStream;
 import ch.enterag.utils.zip.FileEntry;
 import ch.enterag.utils.zip.Zip64File;
@@ -59,14 +57,11 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*Logging information*/
 	private StringBuilder validationLog;
 	
-	
 	@SuppressWarnings("finally")
 	@Override
 	public boolean validate(File siardDatei) throws ValidationEcolumnException {
-		
 		 //All over validation flag
 		 boolean valid = true;
-		 		 	   
 		 try {
 			 //Initialize the validation context
 			 if (prepareValidation(siardDatei) == false) {
@@ -76,22 +71,17 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                     getTextResourceService().getText(MESSAGE_DASHES) +
 	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT));
 			 }
-			 
 			 //Get the prepared SIARD tables from the validation context
 			 List<SiardTable> siardTables = this.getSiardTables();
-			 
 			 //Get the Java properties from the validation context
 			 Properties properties = this.getValidationProperties();
-			 
 			 if (properties == null) {
 				 valid = false;
 				 getMessageService().logInfo(
 	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                     getTextResourceService().getText(MESSAGE_DASHES) +
 	                     getTextResourceService().getText(MESSAGE_MODULE_E_MISSING_PROPERTIES));
-				
 			 }
-			 
 			 if (siardTables == null) {
 				 valid = false;
 				 getMessageService().logInfo(
@@ -99,7 +89,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                     getTextResourceService().getText(MESSAGE_DASHES) +
 	                     getTextResourceService().getText(MESSAGE_MODULE_E_MISSING_SIARD_TABLES));
 			 }
-			 			 
 			 //Validates the number of the attributes
 			 if (validateAttributeCount(siardTables, properties) == false) {
 				 valid = false;
@@ -108,7 +97,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT));
 			 }
-			 			 
+			 //System.out.println(this.getValidationLog().toString());
 			 //Validates the nullable property in metadata.xml
 			 if (validateAttributeOccurrence(siardTables, properties) == false) {
 				valid = false;
@@ -117,7 +106,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE));
 			 }
-			 
+			 //System.out.println(this.getValidationLog().toString());
 			 //Validates the type of table attributes in metadata.xml
 			 if (validateAttributeType(siardTables, properties) == false) {
 				valid = false;
@@ -126,8 +115,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE));
 			 }	
-	         
-			 //Validates the sequence of table attributes in metadata.xml
+	         //Validates the sequence of table attributes in metadata.xml
 			 if (validateAttributeSequence() == false) {
 				valid = false;
 					getMessageService().logInfo(
@@ -135,9 +123,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                getTextResourceService().getText(MESSAGE_DASHES) +
 	                getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE));
 			 }
-			 
-			 System.out.println(this.getValidationLog().toString());
-	         			 
+			 //System.out.println(this.getValidationLog().toString());			 
 		} catch (Exception je) {
 			valid = false;
 			getMessageService().logError(
@@ -149,21 +135,21 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	}
 	
 	private boolean prepareValidation(File siardFile) throws IOException, JDOMException {
-		
+		//All over preparation flag
 		boolean prepared = true;
-		
+		//Load the Java properties to the validation context
 		boolean propertiesLoaded = initializeProperties();
-		
+		//Initialize internal path configuration of the SIARD archive
 		boolean pathInitialized = initializePath(this.getValidationProperties());
-		
+		//Extract the SIARD archive and distribute the content to the validation context
 		boolean siardArchiveExtracted = extractSiardArchive(siardFile);
-		
+		//Pick the metadata.xml and load it to the validation context
 		boolean metadataXMLpicked = pickMetadataXML(this.getValidationProperties());
-		
+		//Prepare the XML configuration and store it to the validation context
 		boolean xmlAcccessPrepared = prepareXMLAccess(this.getValidationProperties(), this.getMetadataXML());
-		
+		//Prepare the data to be validated such as metadata.xml and the according XML schemas
 		boolean validationDataPrepared = prepareValidationData(this.getValidationProperties(), this.getMetadataXML());
-		
+		//Verifying whether the preparation steps were successful
 		if (propertiesLoaded == true &&
 				pathInitialized == true &&
 				xmlAcccessPrepared == true &&
@@ -171,117 +157,131 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 				metadataXMLpicked == true && 
 				validationDataPrepared == true) {
 			prepared = true;
-			
 		}
-		
 		return prepared;
 	}
 	
 	//[E.1]
-	private boolean validateAttributeCount(List<SiardTable> siardTables, Properties properties) throws Exception {
-		
+	private boolean validateAttributeCount(List<SiardTable> siardTables, 
+			Properties properties) throws Exception {
 		boolean valid = true;
-		
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
-		
 		String methodTitle = properties.
 				getProperty("attribute.count.validator");
-		
 		String methodDescription = properties.
 				getProperty("attribute.count.validator.description");
-		
 		validationLog.append(methodTitle);
 		validationLog.append(methodDescription);
-	    
-		//Iteratic over all SIARD tables to count the table attributes
+	    //Iteratic over all SIARD tables to count the table attributes
 		//and compare it to the number of registered attributes in the according XML schemas
 		for (SiardTable siardTable : siardTables) {
-					
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
-			
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
 				valid = true;
 			}
-			
 			//Preparing validation log entry
 			String validationLogSceleton = properties.
 					getProperty("attribute.count.validator.log.entry");
-			
 			String validationLogEntry = MessageFormat.
 					format(validationLogSceleton, 
 						   siardTable.getTableName(), 
 						   metadataXMLColumnsCount,
 						   tableXSDColumnsCount);
-			
 			validationLog.append(validationLogEntry);
 			validationLog.append(properties.getProperty("newline"));
 		}
-		
 		//Write the local validation log to the validation context
 		this.setValidationLog(validationLog);
-		
 		//Return the current validation state
 		return valid;
 	}
 	
 	//[E.2]
-	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, Properties properties) {
-		
+	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, 
+			Properties properties) throws Exception {
 		boolean valid = true;
-		
+		//Initializing validation Logging
+		StringBuilder validationLog = new StringBuilder();
+		String methodTitle = properties.
+				getProperty("attribute.occurrence.validator");
+		String methodDescription = properties.
+				getProperty("attribute.occurrence.validator.description");
+		validationLog.append(methodTitle);
+		validationLog.append(methodDescription);
+		//Iterate over the SIARD tables and verify the nullable attribute
 		for (SiardTable siardTable : siardTables) {
+			//Add table info to the log entry
 			
+			String validationLogTableSceleton = properties.
+					getProperty("attribute.occurrence.validator.log.table");
 			
+			String validationLogTableEntry = MessageFormat.
+					format(validationLogTableSceleton, 
+						   siardTable.getTableName());
 			
+			validationLog.append(validationLogTableEntry);
+			System.out.println(validationLogTableEntry);
+			//Number of attributes in metadata.xml
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
+			//Number of attributes in the according XML schemata
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
-			
-			
-			
-		 
+			//Start the validation if the allover number is equal in metadata.xml and XML schemata	 
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
-				
+				//Element/Attributes of the actual SIARD table
 				List<Element> xmlElements = siardTable.getMetadataXMLElements();
+				//Elements/Attributes of the according XML schema
 				List<Element> xsdElements = siardTable.getTableXSDElements();
-							 
 				Namespace xmlNamespace = this.getXmlNamespace();
-				Namespace xsdNamespace = this.getXsdNamespace();
-				
-				
-									 
 				for ( int i = 0; i < metadataXMLColumnsCount; i++) {
-					
-					
-					
-					
+					//Actual Element of the metadata.xml									
 					Element xmlElement = xmlElements.get(i);
+					//Actual Element of the according XML schema
 					Element xsdElement = xsdElements.get(i);
-					
-					String nullableElementDescription = properties.getProperty("siard.metadata.xml.nullable.element.name");
-					
-					String minuOccursAttributeDescription = properties.getProperty("siard.table.xsd.attribute.minOccurs.name");
-					
-					
-				 
-					String nullable = xmlElement.getChild(nullableElementDescription, xmlNamespace).getValue();
-					String minOccurs = xsdElement.getAttributeValue(minuOccursAttributeDescription);
-					
-					//System.out.println(nullable + ", " + minOccurs + ", " + xsdNamespace.getURI() + ", " + properties.getProperty("siard.table.xsd.attribute.minOccurs.name"));
-				 
+					String nullableElementDescription = properties.
+							getProperty("siard.metadata.xml.nullable.element.name");
+					String minuOccursAttributeDescription = properties.
+							getProperty("siard.table.xsd.attribute.minOccurs.name");
+					//Value of the nullable Element in metadata.xml
+					String nullable = xmlElement.getChild(nullableElementDescription, 
+							xmlNamespace).getValue();
+					//Value of the minOccurs attribute in the according XML schema
+					String minOccurs = xsdElement.
+							getAttributeValue(minuOccursAttributeDescription);
+					//Add column info to the log entry
+					String validationLogColumnSceleton = properties.
+							getProperty("attribute.occurrence.validator.log.column");
+					String validationLogColumnName = properties.getProperty("attribute.occurrence.column.name");
+					Element columnName = xmlElement.getChild(validationLogColumnName, this.getXmlNamespace());
+					String validationLogColumnEntry = MessageFormat.
+							format(validationLogColumnSceleton, 
+								   columnName.getValue(),
+								   xsdElement.getAttribute(properties.
+											getProperty("attribute.occurrence.minOccurs")),
+								   xsdElement.getAttributeValue(properties.
+											getProperty("attribute.occurrence.minOccurs")));
+					validationLog.append(validationLogColumnEntry);
+					validationLog.append(properties.getProperty("newline"));
+					System.out.println(validationLogColumnEntry);
+					//If the nullable Element is set to true and the minOccurs attribute is null
 					if (nullable.equalsIgnoreCase("true") && minOccurs == null) {
+						//Validation fails becaus the minOccurs attribute must be set to zero
 						valid = false;
+					//If the nullable Element is set to true and the minOccurs attribute is set to zero
 					} else if (nullable.equalsIgnoreCase("true") && minOccurs.equalsIgnoreCase("0")) {
-						//Keep empty not to overwrite previous false values
+						//Validation succeded. Statement is leftt empty not to overwrite previous false values
+					//If the nullable Element is set to false and the minOccurs attribute is null
 					} else if (nullable.equalsIgnoreCase("false") && minOccurs == null) {
+						//Validation succeded. Statement is left empty not to overwrite previous false values
 					}
 					//Keep empty not to overwrite previous false values
 				} 
 			} else {
+				//Validation fails if allover number differs in metadata.xml and XML schemata
 				valid = false;
+				
 			}
-			
 		}
 		
 		return valid;
