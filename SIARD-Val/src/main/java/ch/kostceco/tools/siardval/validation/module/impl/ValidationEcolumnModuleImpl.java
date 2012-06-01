@@ -188,7 +188,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					format(validationLogSceleton, 
 						   siardTable.getTableName(), 
 						   metadataXMLColumnsCount,
-						   tableXSDColumnsCount);
+						   tableXSDColumnsCount,
+						   valid);
 			validationLog.append(validationLogEntry);
 			validationLog.append(properties.getProperty("newline"));
 		}
@@ -213,16 +214,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		//Iterate over the SIARD tables and verify the nullable attribute
 		for (SiardTable siardTable : siardTables) {
 			//Add table info to the log entry
-			
 			String validationLogTableSceleton = properties.
 					getProperty("attribute.occurrence.validator.log.table");
-			
 			String validationLogTableEntry = MessageFormat.
 					format(validationLogTableSceleton, 
 						   siardTable.getTableName());
-			
 			validationLog.append(validationLogTableEntry);
-			System.out.println(validationLogTableEntry);
 			//Number of attributes in metadata.xml
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			//Number of attributes in the according XML schemata
@@ -249,21 +246,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					//Value of the minOccurs attribute in the according XML schema
 					String minOccurs = xsdElement.
 							getAttributeValue(minuOccursAttributeDescription);
-					//Add column info to the log entry
-					String validationLogColumnSceleton = properties.
-							getProperty("attribute.occurrence.validator.log.column");
-					String validationLogColumnName = properties.getProperty("attribute.occurrence.column.name");
-					Element columnName = xmlElement.getChild(validationLogColumnName, this.getXmlNamespace());
-					String validationLogColumnEntry = MessageFormat.
-							format(validationLogColumnSceleton, 
-								   columnName.getValue(),
-								   xsdElement.getAttribute(properties.
-											getProperty("attribute.occurrence.minOccurs")),
-								   xsdElement.getAttributeValue(properties.
-											getProperty("attribute.occurrence.minOccurs")));
-					validationLog.append(validationLogColumnEntry);
-					validationLog.append(properties.getProperty("newline"));
-					System.out.println(validationLogColumnEntry);
 					//If the nullable Element is set to true and the minOccurs attribute is null
 					if (nullable.equalsIgnoreCase("true") && minOccurs == null) {
 						//Validation fails becaus the minOccurs attribute must be set to zero
@@ -275,71 +257,86 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					} else if (nullable.equalsIgnoreCase("false") && minOccurs == null) {
 						//Validation succeded. Statement is left empty not to overwrite previous false values
 					}
-					//Keep empty not to overwrite previous false values
+					//Add column info to the log entry
+					String validationLogColumnSceleton = properties.
+							getProperty("attribute.occurrence.validator.log.column");
+					String validationLogColumnName = properties.getProperty("attribute.occurrence.column.name");
+					String validationLogColumnNullable = properties.getProperty("attribute.occurrence.nullable");
+					String validationLogColumnMinOccurs = properties.getProperty("attribute.occurrence.minOccurs");
+					Element columnName = xmlElement.getChild(validationLogColumnName, this.getXmlNamespace());
+					Element columnNullable = xmlElement.getChild(validationLogColumnNullable, this.getXmlNamespace());
+					String columnMinOccurs = xsdElement.getAttributeValue(validationLogColumnMinOccurs);
+					String validationLogColumnEntry = MessageFormat.
+							format(validationLogColumnSceleton, 
+								   columnName.getValue(),
+								   columnNullable.getName(),
+								   columnNullable.getValue(),
+								   validationLogColumnMinOccurs,
+								   columnMinOccurs, 
+								   valid);
+					validationLog.append(validationLogColumnEntry);
+					validationLog.append(properties.getProperty("newline"));
 				} 
 			} else {
 				//Validation fails if allover number differs in metadata.xml and XML schemata
 				valid = false;
-				
 			}
 		}
-		
+		//Write the local validation log to the validation context
+	    this.setValidationLog(validationLog);
+	    //Return the current validation state
 		return valid;
 	}
 	
-	private boolean validateAttributeType(List<SiardTable> siardTables, Properties properties) {
-		
+	private boolean validateAttributeType(List<SiardTable> siardTables, 
+			Properties properties) throws Exception {
 		boolean valid = true;
-		
+		//Initializing validation Logging
+		StringBuilder validationLog = new StringBuilder();
+		String methodTitle = properties.
+				getProperty("attribute.type.validator");
+		String methodDescription = properties.
+				getProperty("attribute.type.validator.description");
+		validationLog.append(methodTitle);
+		validationLog.append(methodDescription);
 		List<String> xmlElementSequence = new ArrayList<String>();
 		List<String> xsdElementSequence = new ArrayList<String>();
-		
 		for (SiardTable siardTable : siardTables) {
-			
 			List<Element> xmlElements = siardTable.getMetadataXMLElements();
 			List<Element> xsdElements = siardTable.getTableXSDElements();
-		 	
 			if (xmlElements.size() == xsdElements.size()) {
-				
-				
-				
 				for ( int i = 0; i < xmlElements.size(); i++ ) {
-					
 					Element xmlElement = xmlElements.get(i);
 					Element xsdElement = xsdElements.get(i);
-					
-					
-					
 					String xmlTypeElementName = properties.getProperty("siard.metadata.xml.type.element.name");
 					//String xmlNameElementName = properties.getProperty("siard.metadata.xml.name.element.name");
 					String xsdTypeAttributeName = properties.getProperty("siard.table.xsd.type.attribute.name");
-					
 					//Check the nullable Element
 					String leftSide = xmlElement.getChild(xmlTypeElementName, this.getXmlNamespace()).getValue();
-						
 					//Check the minOccurs Attribute
 					String rightSide = xsdElement.getAttributeValue(xsdTypeAttributeName);
-					
-					//?
-					//String elementName = xmlElement.getChild("name", this.getXmlNamespace()).getValue();
-					
 					String delimiter = properties.getProperty("attribute.sequence.validator.original.type.delimiter");
-					
 					String trimmedExpectedType = trimLeftSideType(leftSide, delimiter);
-					
 					String expectedType = properties.getProperty(trimmedExpectedType);
-					
-					
-					//All over list to check the sequence of all types
-					
 					xmlElementSequence.add(expectedType);
 					xsdElementSequence.add(rightSide);
-					
-					
 					if (expectedType.equalsIgnoreCase(rightSide)) {
 					} else {
 						valid = false;
 					}
+					//Add column info to the log entry
+					String validationLogTypeSceleton = properties.
+							getProperty("attribute.type.validator.log.column");
+					String validationLogColumnName = properties.getProperty("attribute.occurrence.column.name");
+					String validationLogTypeName = properties.getProperty("attribute.occurrence.column.name");
+					Element columnName = xmlElement.getChild(validationLogColumnName, this.getXmlNamespace());
+					String validationLogColumnEntry = MessageFormat.
+							format(validationLogTypeSceleton, 
+								   columnName.getValue(),
+								   trimmedExpectedType,
+								   rightSide);
+					validationLog.append(validationLogColumnEntry);
+					validationLog.append(properties.getProperty("newline"));
 				}
 			} else {
 				valid = false;
@@ -347,12 +344,14 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		}
 		this.setXmlElementsSequence(xmlElementSequence);
 		this.setXsdElementsSequence(xsdElementSequence);
-		
+		//Writes back validatable XML elements
 		if (this.getXmlElementsSequence() != null && this.getXsdElementsSequence() != null) {
 			valid = true;
 		}
-		
-		
+		//Write the local validation log to the validation context
+		System.out.println(validationLog.toString());
+	    this.setValidationLog(validationLog);
+	    //Return the current validation state
 		return valid;
 	}
 	
