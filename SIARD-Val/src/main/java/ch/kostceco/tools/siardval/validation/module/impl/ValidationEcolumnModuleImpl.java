@@ -189,6 +189,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeCount(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
 		boolean valid = true;
+		final String ME = "[E.1] validateAttributeCount(List<SiardTable> siardTables, " +
+				"Properties properties) ";
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
 		String methodTitle = properties.
@@ -213,9 +215,16 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 						   siardTable.getTableName(), 
 						   metadataXMLColumnsCount,
 						   tableXSDColumnsCount,
+						   siardTable.getTableName(),
 						   valid);
 			validationLog.append(validationLogEntry);
 			validationLog.append(properties.getProperty("newline"));
+		}
+		if (valid = true) {
+			String message = properties.getProperty("successfully.executed");
+			String newLine = properties.getProperty("newline");
+			validationLog.append(newLine);
+			validationLog.append(ME + message);
 		}
 		//Write the local validation log to the validation context
 		this.setValidationLog(validationLog);
@@ -227,6 +236,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
 		boolean valid = true;
+		final String ME = "[E.2] validateAttributeOccurrence(List<SiardTable> siardTables, " +
+				"Properties properties) ";
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
 		String methodTitle = properties.
@@ -296,7 +307,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 								   columnNullable.getName(),
 								   columnNullable.getValue(),
 								   validationLogColumnMinOccurs,
-								   columnMinOccurs, 
+								   columnMinOccurs,
+								   siardTable.getTableName(),
 								   valid);
 					validationLog.append(validationLogColumnEntry);
 					validationLog.append(properties.getProperty("newline"));
@@ -306,7 +318,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 				valid = false;
 			}
 		}
-		//Write the local validation log to the validation context
+		if (valid = true) {
+			String message = properties.getProperty("successfully.executed");
+			String newLine = properties.getProperty("newline");
+			validationLog.append(newLine);
+			validationLog.append(ME + message);
+		}
+	    //Write the local validation log to the validation context
 	    this.setValidationLog(validationLog);
 	    //Return the current validation state
 		return valid;
@@ -315,6 +333,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeType(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
 		boolean valid = true;
+		final String ME = "[E.3] validateAttributeType(List<SiardTable> siardTables, " +
+				"Properties properties)";
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
 		String methodTitle = properties.
@@ -370,10 +390,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					String validationLogColumnName = properties.getProperty("attribute.occurrence.column.name");
 					Element columnName = xmlElement.getChild(validationLogColumnName, this.getXmlNamespace());
 					String validationLogColumnEntry = MessageFormat.
-							format(validationLogTypeSceleton, 
+							format(validationLogTypeSceleton,
 								   columnName.getValue(),
 								   leftSide,
+								   siardTable.getTableName(),
 								   expectedType,
+								   siardTable.getTableName(),
 								   rightSide,
 								   valid);
 					validationLog.append(validationLogColumnEntry);
@@ -388,6 +410,11 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		this.setXsdElementsSequence(xsdElementSequence);
 		//Writes back validatable XML elements
 		if (this.getXmlElementsSequence() != null && this.getXsdElementsSequence() != null) {
+			String message = properties.getProperty("successfully.executed");
+			String newLine = properties.getProperty("newline");
+			validationLog.append(newLine);
+			validationLog.append(ME + message);
+			
 			valid = true;
 		}
 		//Write the local validation log to the validation context
@@ -399,6 +426,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean validateAttributeSequence(Properties properties) 
 			throws Exception {
 		boolean valid = true;
+		final String ME = "[E.4] validateAttributeSequence(Properties properties)";
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
 		String methodTitle = properties.
@@ -433,6 +461,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		} else {
 			valid = false;
 		}
+		if (valid = true) {
+			String message = properties.getProperty("successfully.executed");
+			String newLine = properties.getProperty("newline");
+			validationLog.append(newLine);
+			validationLog.append(ME + message);
+		}
 		//Write the local validation log to the validation context
 		this.setValidationLog(validationLog);
 		return valid; 
@@ -452,7 +486,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		if (this.getValidationProperties() != null) {
 			successfullyCommitted = true;
 			//Set header line to validation log
-			String headerLine = properties.getProperty("header.line");
+			String headerLine = properties.getProperty("newline");
 			this.getValidationLog().append(headerLine);
 			String message = properties.getProperty("successfully.executed");
 			this.getValidationLog().append(me + message);
@@ -555,8 +589,9 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			    }
 			    extractedSiardFiles.put(newFile.getPath(), newFile);
 			    eis.close();
-			    fos.close();                
+			    fos.close();
 			}
+			
 		}
 		this.setSiardFiles(extractedSiardFiles);
 		if (this.getSiardFiles() != null) {
@@ -605,6 +640,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         		List<Element> siardTableElements = siardTablesElement.getChildren(properties.
         				getProperty("siard.metadata.xml.table.name"), this.getXmlNamespace());
         		for (Element siardTableElement : siardTableElements) {
+        			
            			Element siardColumnsElement = siardTableElement.getChild(properties.
         					getProperty("siard.metadata.xml.columns.name"), this.getXmlNamespace());
         			List<Element> siardColumnElements = siardColumnsElement.getChildren(properties.
@@ -629,22 +665,32 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         		    pathToTableSchema.append(properties.getProperty("siard.table.xsd.file.extension"));
         		    File tableSchema = this.getSiardFiles().get(pathToTableSchema.toString());
            			SAXBuilder builder = new SAXBuilder();
-        			Document tableSchemaDocument = builder.build(tableSchema);
+           			Document tableSchemaDocument = builder.build(tableSchema);
+        			
            			Element tableSchemaRootElement = tableSchemaDocument.getRootElement();
+           			
         			Namespace namespace = tableSchemaRootElement.getNamespace();
+        			
            			Element tableSchemaComplexType = tableSchemaRootElement.getChild(properties.
         					getProperty("siard.table.xsd.complexType"), namespace);
+           			
         			Element tableSchemaComplexTypeSequence = tableSchemaComplexType.getChild(properties.
         					getProperty("siard.table.xsd.sequence"), namespace);
+        			
         			List<Element> tableSchemaComplexTypeElements = tableSchemaComplexTypeSequence.getChildren(properties.
         					getProperty("siard.table.xsd.element"), namespace);
+        			
         			siardTable.setTableXSDElements(tableSchemaComplexTypeElements);
+        			
         			siardTables.add(siardTable);
-           			this.setSiardTables(siardTables);	
+        			
+           			this.setSiardTables(siardTables);
+           			
         		}		
         	}
         }
         if (this.getSiardTables() != null) {
+        	
         	String message = properties.getProperty("successfully.executed");
 			this.getValidationLog().append(me + message);
         	successfullyCommitted = true;
