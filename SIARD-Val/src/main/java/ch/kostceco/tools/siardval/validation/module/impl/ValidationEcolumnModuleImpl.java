@@ -1,15 +1,27 @@
+/*
+ * (C) Copyright KOST-CECO - All Rights Reserved
+ *
+ *	 SIARD-Val is a development of the KOST-CECO. All rights rest with the KOST-CECO. 
+ * This application is free software: you can redistribute it and/or modify it under the 
+ * terms of the GNU General Public License as published by the Free Software Foundation, 
+ * either version 3 of the License, or (at your option) any later version. 
+ * This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * See the follow GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with this program; 
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *   Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package ch.kostceco.tools.siardval.validation.module.impl;
  
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,45 +38,344 @@ import ch.kostceco.tools.siardval.validation.ValidationModuleImpl;
 import ch.kostceco.tools.siardval.validation.bean.SiardTable;
 import ch.kostceco.tools.siardval.validation.module.ValidationEcolumnModule;
 
+/**
+ * <code>ValidationEcolumnModule</code> provides a means to produce concatenated
+ * messages in a language-neutral way. Use this to construct messages
+ * displayed for end users.
+ *
+ * <p>
+ * <code>MessageFormat</code> takes a set of objects, formats them, then
+ * inserts the formatted strings into the pattern at the appropriate places.
+ *
+ * <p>
+ * <strong>Note:</strong>
+ * <code>MessageFormat</code> differs from the other <code>Format</code>
+ * classes in that you create a <code>MessageFormat</code> object with one
+ * of its constructors (not with a <code>getInstance</code> style factory
+ * method). The factory methods aren't necessary because <code>MessageFormat</code>
+ * itself doesn't implement locale specific behavior. Any locale specific
+ * behavior is defined by the pattern that you provide as well as the
+ * subformats used for inserted arguments.
+ *
+ * <h4><a name="patterns">Patterns and Their Interpretation</a></h4>
+ *
+ * <code>MessageFormat</code> uses patterns of the following form:
+ * <blockquote><pre>
+ * <i>MessageFormatPattern:</i>
+ *         <i>String</i>
+ *         <i>MessageFormatPattern</i> <i>FormatElement</i> <i>String</i>
+ *
+ * <i>FormatElement:</i>
+ *         { <i>ArgumentIndex</i> }
+ *         { <i>ArgumentIndex</i> , <i>FormatType</i> }
+ *         { <i>ArgumentIndex</i> , <i>FormatType</i> , <i>FormatStyle</i> }
+ *
+ * <i>FormatType: one of </i>
+ *         number date time choice
+ *
+ * <i>FormatStyle:</i>
+ *         short
+ *         medium
+ *         long
+ *         full
+ *         integer
+ *         currency
+ *         percent
+ *         <i>SubformatPattern</i>
+ * </pre></blockquote>
+ *
+ * <p>Within a <i>String</i>, a pair of single quotes can be used to
+ * quote any arbitrary characters except single quotes. For example,
+ * pattern string <code>"'{0}'"</code> represents string
+ * <code>"{0}"</code>, not a <i>FormatElement</i>. A single quote itself
+ * must be represented by doubled single quotes {@code ''} throughout a
+ * <i>String</i>.  For example, pattern string <code>"'{''}'"</code> is
+ * interpreted as a sequence of <code>'{</code> (start of quoting and a
+ * left curly brace), <code>''</code> (a single quote), and
+ * <code>}'</code> (a right curly brace and end of quoting),
+ * <em>not</em> <code>'{'</code> and <code>'}'</code> (quoted left and
+ * right curly braces): representing string <code>"{'}"</code>,
+ * <em>not</em> <code>"{}"</code>.
+ *
+ * <p>A <i>SubformatPattern</i> is interpreted by its corresponding
+ * subformat, and subformat-dependent pattern rules apply. For example,
+ * pattern string <code>"{1,number,<u>$'#',##</u>}"</code>
+ * (<i>SubformatPattern</i> with underline) will produce a number format
+ * with the pound-sign quoted, with a result such as: {@code
+ * "$#31,45"}. Refer to each {@code Format} subclass documentation for
+ * details.
+ *
+ * <p>Any unmatched quote is treated as closed at the end of the given
+ * pattern. For example, pattern string {@code "'{0}"} is treated as
+ * pattern {@code "'{0}'"}.
+ *
+ * <p>Any curly braces within an unquoted pattern must be balanced. For
+ * example, <code>"ab {0} de"</code> and <code>"ab '}' de"</code> are
+ * valid patterns, but <code>"ab {0'}' de"</code>, <code>"ab } de"</code>
+ * and <code>"''{''"</code> are not.
+ *
+ * <p>
+ * <dl><dt><b>Warning:</b><dd>The rules for using quotes within message
+ * format patterns unfortunately have shown to be somewhat confusing.
+ * In particular, it isn't always obvious to localizers whether single
+ * quotes need to be doubled or not. Make sure to inform localizers about
+ * the rules, and tell them (for example, by using comments in resource
+ * bundle source files) which strings will be processed by {@code MessageFormat}.
+ * Note that localizers may need to use single quotes in translated
+ * strings where the original version doesn't have them.
+ * </dl>
+ * <p>
+ * The <i>ArgumentIndex</i> value is a non-negative integer written
+ * using the digits {@code '0'} through {@code '9'}, and represents an index into the
+ * {@code arguments} array passed to the {@code format} methods
+ * or the result array returned by the {@code parse} methods.
+ * <p>
+ * The <i>FormatType</i> and <i>FormatStyle</i> values are used to create
+ * a {@code Format} instance for the format element. The following
+ * table shows how the values map to {@code Format} instances. Combinations not
+ * shown in the table are illegal. A <i>SubformatPattern</i> must
+ * be a valid pattern string for the {@code Format} subclass used.
+ * <p>
+ * <table border=1 summary="Shows how FormatType and FormatStyle values map to Format instances">
+ *    <tr>
+ *       <th id="ft" class="TableHeadingColor">FormatType
+ *       <th id="fs" class="TableHeadingColor">FormatStyle
+ *       <th id="sc" class="TableHeadingColor">Subformat Created
+ *    <tr>
+ *       <td headers="ft"><i>(none)</i>
+ *       <td headers="fs"><i>(none)</i>
+ *       <td headers="sc"><code>null</code>
+ *    <tr>
+ *       <td headers="ft" rowspan=5><code>number</code>
+ *       <td headers="fs"><i>(none)</i>
+ *       <td headers="sc">{@link NumberFormat#getInstance(Locale) NumberFormat.getInstance}{@code (getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>integer</code>
+ *       <td headers="sc">{@link NumberFormat#getIntegerInstance(Locale) NumberFormat.getIntegerInstance}{@code (getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>currency</code>
+ *       <td headers="sc">{@link NumberFormat#getCurrencyInstance(Locale) NumberFormat.getCurrencyInstance}{@code (getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>percent</code>
+ *       <td headers="sc">{@link NumberFormat#getPercentInstance(Locale) NumberFormat.getPercentInstance}{@code (getLocale())}
+ *    <tr>
+ *       <td headers="fs"><i>SubformatPattern</i>
+ *       <td headers="sc">{@code new} {@link DecimalFormat#DecimalFormat(String,DecimalFormatSymbols) DecimalFormat}{@code (subformatPattern,} {@link DecimalFormatSymbols#getInstance(Locale) DecimalFormatSymbols.getInstance}{@code (getLocale()))}
+ *    <tr>
+ *       <td headers="ft" rowspan=6><code>date</code>
+ *       <td headers="fs"><i>(none)</i>
+ *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>short</code>
+ *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#SHORT}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>medium</code>
+ *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>long</code>
+ *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#LONG}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>full</code>
+ *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#FULL}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><i>SubformatPattern</i>
+ *       <td headers="sc">{@code new} {@link SimpleDateFormat#SimpleDateFormat(String,Locale) SimpleDateFormat}{@code (subformatPattern, getLocale())}
+ *    <tr>
+ *       <td headers="ft" rowspan=6><code>time</code>
+ *       <td headers="fs"><i>(none)</i>
+ *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>short</code>
+ *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#SHORT}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>medium</code>
+ *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>long</code>
+ *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#LONG}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><code>full</code>
+ *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#FULL}{@code , getLocale())}
+ *    <tr>
+ *       <td headers="fs"><i>SubformatPattern</i>
+ *       <td headers="sc">{@code new} {@link SimpleDateFormat#SimpleDateFormat(String,Locale) SimpleDateFormat}{@code (subformatPattern, getLocale())}
+ *    <tr>
+ *       <td headers="ft"><code>choice</code>
+ *       <td headers="fs"><i>SubformatPattern</i>
+ *       <td headers="sc">{@code new} {@link ChoiceFormat#ChoiceFormat(String) ChoiceFormat}{@code (subformatPattern)}
+ * </table>
+ * <p>
+ *
+ * <h4>Usage Information</h4>
+ *
+ * <p>
+ * Here are some examples of usage.
+ * In real internationalized programs, the message format pattern and other
+ * static strings will, of course, be obtained from resource bundles.
+ * Other parameters will be dynamically determined at runtime.
+ * <p>
+ * The first example uses the static method <code>MessageFormat.format</code>,
+ * which internally creates a <code>MessageFormat</code> for one-time use:
+ * <blockquote><pre>
+ * int planet = 7;
+ * String event = "a disturbance in the Force";
+ *
+ * String result = MessageFormat.format(
+ *     "At {1,time} on {1,date}, there was {2} on planet {0,number,integer}.",
+ *     planet, new Date(), event);
+ * </pre></blockquote>
+ * The output is:
+ * <blockquote><pre>
+ * At 12:30 PM on Jul 3, 2053, there was a disturbance in the Force on planet 7.
+ * </pre></blockquote>
+ *
+ * <p>
+ * The following example creates a <code>MessageFormat</code> instance that
+ * can be used repeatedly:
+ * <blockquote><pre>
+ * int fileCount = 1273;
+ * String diskName = "MyDisk";
+ * Object[] testArgs = {new Long(fileCount), diskName};
+ *
+ * MessageFormat form = new MessageFormat(
+ *     "The disk \"{1}\" contains {0} file(s).");
+ *
+ * System.out.println(form.format(testArgs));
+ * </pre></blockquote>
+ * The output with different values for <code>fileCount</code>:
+ * <blockquote><pre>
+ * The disk "MyDisk" contains 0 file(s).
+ * The disk "MyDisk" contains 1 file(s).
+ * The disk "MyDisk" contains 1,273 file(s).
+ * </pre></blockquote>
+ *
+ * <p>
+ * For more sophisticated patterns, you can use a <code>ChoiceFormat</code>
+ * to produce correct forms for singular and plural:
+ * <blockquote><pre>
+ * MessageFormat form = new MessageFormat("The disk \"{1}\" contains {0}.");
+ * double[] filelimits = {0,1,2};
+ * String[] filepart = {"no files","one file","{0,number} files"};
+ * ChoiceFormat fileform = new ChoiceFormat(filelimits, filepart);
+ * form.setFormatByArgumentIndex(0, fileform);
+ *
+ * int fileCount = 1273;
+ * String diskName = "MyDisk";
+ * Object[] testArgs = {new Long(fileCount), diskName};
+ *
+ * System.out.println(form.format(testArgs));
+ * </pre></blockquote>
+ * The output with different values for <code>fileCount</code>:
+ * <blockquote><pre>
+ * The disk "MyDisk" contains no files.
+ * The disk "MyDisk" contains one file.
+ * The disk "MyDisk" contains 1,273 files.
+ * </pre></blockquote>
+ *
+ * <p>
+ * You can create the <code>ChoiceFormat</code> programmatically, as in the
+ * above example, or by using a pattern. See {@link ChoiceFormat}
+ * for more information.
+ * <blockquote><pre>
+ * form.applyPattern(
+ *    "There {0,choice,0#are no files|1#is one file|1&lt;are {0,number,integer} files}.");
+ * </pre></blockquote>
+ *
+ * <p>
+ * <strong>Note:</strong> As we see above, the string produced
+ * by a <code>ChoiceFormat</code> in <code>MessageFormat</code> is treated as special;
+ * occurrences of '{' are used to indicate subformats, and cause recursion.
+ * If you create both a <code>MessageFormat</code> and <code>ChoiceFormat</code>
+ * programmatically (instead of using the string patterns), then be careful not to
+ * produce a format that recurses on itself, which will cause an infinite loop.
+ * <p>
+ * When a single argument is parsed more than once in the string, the last match
+ * will be the final result of the parsing.  For example,
+ * <blockquote><pre>
+ * MessageFormat mf = new MessageFormat("{0,number,#.##}, {0,number,#.#}");
+ * Object[] objs = {new Double(3.1415)};
+ * String result = mf.format( objs );
+ * // result now equals "3.14, 3.1"
+ * objs = null;
+ * objs = mf.parse(result, new ParsePosition(0));
+ * // objs now equals {new Double(3.1)}
+ * </pre></blockquote>
+ *
+ * <p>
+ * Likewise, parsing with a {@code MessageFormat} object using patterns containing
+ * multiple occurrences of the same argument would return the last match.  For
+ * example,
+ * <blockquote><pre>
+ * MessageFormat mf = new MessageFormat("{0}, {0}, {0}");
+ * String forParsing = "x, y, z";
+ * Object[] objs = mf.parse(forParsing, new ParsePosition(0));
+ * // result now equals {new String("z")}
+ * </pre></blockquote>
+ *
+ * <h4><a name="synchronization">Synchronization</a></h4>
+ *
+ * <p>
+ * Message formats are not synchronized.
+ * It is recommended to create separate format instances for each thread.
+ * If multiple threads access a format concurrently, it must be synchronized
+ * externally.
+ *
+ * @see          java.util.Locale
+ * @see          Format
+ * @see          NumberFormat
+ * @see          DecimalFormat
+ * @see          DecimalFormatSymbols
+ * @see          ChoiceFormat
+ * @see          DateFormat
+ * @see          SimpleDateFormat
+ *
+ * @author       Olivier Debenath
+ */
+
 public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements ValidationEcolumnModule {
     /*Validation parameters*/
 	private boolean verboseMode;
-	
 	/*Service related properties*/
 	private ConfigurationService configurationService;
- 
 	/*Validation context related properties*/
 	private Properties validationProperties;
- 
 	/*Content of the SIARD package*/
 	private HashMap<String, File> siardFiles;
 	private File metadataXML;
 	private Document metadataXMLDocument;
 	private String contentPath; 
 	private String headerPath;
-	
 	/*SIARD XML processing related properties*/
 	private List<Element> xmlElements;
 	private List<Element> xsdElements;
-	
 	private List<String> xmlElementsSequence;
 	private List<String> xsdElementsSequence;
-	
 	private List<SiardTable> siardTables;
- 
 	/*General XML related properties for JDOM Access*/
 	private String namespaceURI;
 	private String xmlPrefix;
 	private String xsdPrefix;
-	
 	private Namespace xmlNamespace;
 	private Namespace xsdNamespace;
-  
 	/*Logging information*/
 	private StringBuilder validationLog;
 	
-	
 	/* [E] */
+	 /**
+     * Entry point of the column validation. The <code>validate</code> 
+     * method first initializes the validation context. Therefore the
+     * method <code>prepareValidation</code> is executed prior to the
+     * actual validation. The column validation itself is divided into
+     * the validation of the attribute count, the validation of the
+     * attribute occurrence, the validation of the attribute types and
+     * the validation of the attribute's sequence
+     * <a href="#patterns">class description</a>.
+     *
+     * @param SIARD archive containing the tables whose columns are to be
+     * validated
+     * @exception ValidationEcolumnException if the representation of the 
+     * columns is invalid
+     */
 	@SuppressWarnings("finally")
 	@Override
 	public boolean validate(File siardDatei) throws ValidationEcolumnException {
@@ -221,6 +532,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			validationLog.append(properties.getProperty("newline"));
 		}
 		if (valid = true) {
+			//Updating validation log
 			String message = properties.getProperty("successfully.executed");
 			String newLine = properties.getProperty("newline");
 			validationLog.append(newLine);
@@ -233,6 +545,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	}
 	
 	/* [E.2] */
+	/**
+     * Resolves instances being deserialized to the predefined constants.
+     *
+     * @throws InvalidObjectException if the constant could not be
+     *         resolved.
+     * @return resolved MessageFormat.Field constant
+     */
 	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
 		boolean valid = true;
@@ -319,6 +638,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			}
 		}
 		if (valid = true) {
+			//Updating vlidation log
 			String message = properties.getProperty("successfully.executed");
 			String newLine = properties.getProperty("newline");
 			validationLog.append(newLine);
@@ -410,11 +730,11 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		this.setXsdElementsSequence(xsdElementSequence);
 		//Writes back validatable XML elements
 		if (this.getXmlElementsSequence() != null && this.getXsdElementsSequence() != null) {
+			//Updating validation log
 			String message = properties.getProperty("successfully.executed");
 			String newLine = properties.getProperty("newline");
 			validationLog.append(newLine);
 			validationLog.append(ME + message);
-			
 			valid = true;
 		}
 		//Write the local validation log to the validation context
@@ -443,6 +763,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		int xsdTypesSequenceCount = xsdTypesSequence.size();
 		//Verify whether the number of all column type elements are equal in metadata.xml and according table.xsd
 		if (xmlTypesSequenceCount == xsdTypesSequenceCount) {
+			//Iterating over the total count of columns
 			for ( int i = 0; i < xmlTypesSequenceCount; i++ ) {
 				String xmlType = xmlTypesSequence.get(i);
 				String xsdType = xsdTypesSequence.get(i);
@@ -462,6 +783,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			valid = false;
 		}
 		if (valid = true) {
+			//Updating validation log
 			String message = properties.getProperty("successfully.executed");
 			String newLine = properties.getProperty("newline");
 			validationLog.append(newLine);
@@ -479,6 +801,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		String me = "[E.0.1] initializeProperties() ";
 		//Initializing the validation context properties
 		String propertiesName = "/validation.properties";
+		//Get the properties file
 		InputStream propertiesInputStream = getClass().getResourceAsStream(propertiesName);
 		Properties properties = new Properties();
 		properties.load(propertiesInputStream);
@@ -500,18 +823,21 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		StringBuffer headerPath = new StringBuffer();
 		StringBuffer contentPath = new StringBuffer();
 		String workDir = this.getConfigurationService().getPathToWorkDir();
+		//Preparing the internal SIARD directory structure
 		headerPath.append(workDir);
 		headerPath.append(File.separator);
 		headerPath.append(properties.getProperty("header.suffix"));
 		contentPath.append(workDir);
 		contentPath.append(File.separator);
 		contentPath.append(properties.getProperty("content.suffix"));
+		//Writing back the directory structure to the validation context
 		this.setHeaderPath(headerPath.toString());
 		this.setContentPath(contentPath.toString());
 		if (this.getHeaderPath() != null && this.getContentPath() != null) {
-			successfullyCommitted = true;
+			//Updating the validation log
 			String message = properties.getProperty("successfully.executed");
 			this.getValidationLog().append(me + message);
+			successfullyCommitted = true;
 		}
 		return successfullyCommitted;
 	} 
@@ -520,8 +846,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			throws JDOMException, IOException {
 		boolean successfullyCommitted = false;
 		String me = "[E.0.5] prepareXMLAccess(Properties properties, File metadataXML) ";
-		StringBuffer headerPath = new StringBuffer();
-		StringBuffer contentPath = new StringBuffer();
 		InputStream inputStream = new FileInputStream(metadataXML);
   		SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(inputStream);
@@ -545,9 +869,10 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			 this.getXmlPrefix() != null &&
 			 this.getXsdPrefix() != null &&
 			 this.getMetadataXMLDocument() != null) {
-			String message = properties.getProperty("successfully.executed");
-			this.getValidationLog().append(me + message);
-			successfullyCommitted = true;
+			 //Updating the validation log
+			 String message = properties.getProperty("successfully.executed");
+			 this.getValidationLog().append(me + message);
+			 successfullyCommitted = true;
 		}
 		return successfullyCommitted;
 	}    
@@ -566,14 +891,14 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			   throws FileNotFoundException, IOException {
     	boolean sucessfullyCommitted = false;
     	String me = "[E.0.3] extractSiardArchive (File packedSiardArchive) ";
-		StringBuffer headerPath = new StringBuffer();
-		StringBuffer contentPath = new StringBuffer();
-		String workDir = this.getConfigurationService().getPathToWorkDir();
-		Zip64File zipfile = new Zip64File(packedSiardArchive);
+		//Initializing the access to the SIARD archive
+    	Zip64File zipfile = new Zip64File(packedSiardArchive);
 		List<FileEntry> fileEntryList = zipfile.getListFileEntries();
 		String pathToWorkDir = getConfigurationService().getPathToWorkDir();
 		File tmpDir = new File(pathToWorkDir);
+		//Initializing the resulting Hashmap containing all files, indexed by its absolute path
 		HashMap<String, File> extractedSiardFiles = new HashMap<String, File>();
+		//Iterating over the whole SIARD archive
 		for (FileEntry fileEntry : fileEntryList) {
 			if (!fileEntry.isDirectory()) {
 				byte[] buffer = new byte[8192];
@@ -595,6 +920,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		}
 		this.setSiardFiles(extractedSiardFiles);
 		if (this.getSiardFiles() != null) {
+			//Upodating the validation log
 			String message = properties.getProperty("successfully.executed");
 			this.getValidationLog().append(me + message);
 			sucessfullyCommitted = true;
@@ -609,8 +935,10 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		String pathToMetadataXML = this.getConfigurationService().getPathToWorkDir();
 		pathToMetadataXML = pathToMetadataXML+properties.getProperty("siard.description");
 		File metadataXML = siardFiles.get(pathToMetadataXML);
+		//Retreave the metadata.xml from the SIARD archive and writes it back to the validation context
 		this.setMetadataXML(metadataXML);
 		if (this.getMetadataXML() != null) {
+			//Updating the validation log
 			String message = properties.getProperty("successfully.executed");
 			this.getValidationLog().append(me + message);
 			successfullyCommitted = true;
@@ -622,16 +950,20 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			throws JDOMException, IOException {
 		boolean successfullyCommitted = false;
 		String me = "[E.0.6] prepareValidationData (Properties properties, File metadataXML) ";
+		//Gets the tables to be validated
 		List<SiardTable> siardTables = new ArrayList<SiardTable>();
 		Document document = this.getMetadataXMLDocument();
         Element rootElement = document.getRootElement();
         String workingDirectory = this.getConfigurationService().getPathToWorkDir();     
         String siardSchemasElementsName = properties.getProperty("siard.metadata.xml.schemas.name");
+        //Gets the list of <schemas> elements from metadata.xml
         List<Element> siardSchemasElements = rootElement.getChildren(siardSchemasElementsName, 
-        this.getXmlNamespace());
+        		this.getXmlNamespace());
         for (Element siardSchemasElement : siardSchemasElements) {
-           	List<Element> siardSchemaElements = siardSchemasElement.getChildren(properties.
+           	//Gets the list of <schema> elements from metadata.xml
+        	List<Element> siardSchemaElements = siardSchemasElement.getChildren(properties.
         			getProperty("siard.metadata.xml.schema.name"), this.getXmlNamespace());
+        	//Iterating over all <schema> elements
         	for (Element siardSchemaElement : siardSchemaElements) {
            		String schemaFolderName = siardSchemaElement.getChild(properties.
         				getProperty("siard.metadata.xml.schema.folder.name"), this.getXmlNamespace()).getValue();
@@ -639,8 +971,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         				getProperty("siard.metadata.xml.tables.name"), this.getXmlNamespace());
         		List<Element> siardTableElements = siardTablesElement.getChildren(properties.
         				getProperty("siard.metadata.xml.table.name"), this.getXmlNamespace());
+        		//Iterating over all containing table elements
         		for (Element siardTableElement : siardTableElements) {
-        			
            			Element siardColumnsElement = siardTableElement.getChild(properties.
         					getProperty("siard.metadata.xml.columns.name"), this.getXmlNamespace());
         			List<Element> siardColumnElements = siardColumnsElement.getChildren(properties.
@@ -653,7 +985,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         			String siardTableFolderName = siardTableElement.getChild(properties.
         					getProperty("siard.metadata.xml.table.folder.name"), this.getXmlNamespace()).getValue();
         			StringBuilder pathToTableSchema = new StringBuilder();
-        		    pathToTableSchema.append(workingDirectory);
+        		    //Preparing access to the according XML schema file
+        			pathToTableSchema.append(workingDirectory);
         		    pathToTableSchema.append(File.separator);
         		    pathToTableSchema.append(properties.getProperty("siard.path.to.content"));
         		    pathToTableSchema.append(File.separator);
@@ -663,41 +996,34 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         		    pathToTableSchema.append(File.separator);
         		    pathToTableSchema.append(siardTableFolderName.replaceAll(" ", ""));
         		    pathToTableSchema.append(properties.getProperty("siard.table.xsd.file.extension"));
+        		    //Retrieve the according XML schema
         		    File tableSchema = this.getSiardFiles().get(pathToTableSchema.toString());
            			SAXBuilder builder = new SAXBuilder();
            			Document tableSchemaDocument = builder.build(tableSchema);
-        			
            			Element tableSchemaRootElement = tableSchemaDocument.getRootElement();
-           			
         			Namespace namespace = tableSchemaRootElement.getNamespace();
-        			
+        			//Getting the tags from XML schema to be validated
            			Element tableSchemaComplexType = tableSchemaRootElement.getChild(properties.
         					getProperty("siard.table.xsd.complexType"), namespace);
-           			
         			Element tableSchemaComplexTypeSequence = tableSchemaComplexType.getChild(properties.
         					getProperty("siard.table.xsd.sequence"), namespace);
-        			
         			List<Element> tableSchemaComplexTypeElements = tableSchemaComplexTypeSequence.getChildren(properties.
         					getProperty("siard.table.xsd.element"), namespace);
-        			
         			siardTable.setTableXSDElements(tableSchemaComplexTypeElements);
-        			
         			siardTables.add(siardTable);
-        			
+                    //Writing back the List off all SIARD tables to the validation context
            			this.setSiardTables(siardTables);
-           			
         		}		
         	}
         }
         if (this.getSiardTables() != null) {
-        	
+        	//Updating the validation log
         	String message = properties.getProperty("successfully.executed");
 			this.getValidationLog().append(me + message);
         	successfullyCommitted = true;
         }
 		return successfullyCommitted;
 	}
-	
 	//Setter and Getter methods
 	/**
 	 * @return the configurationService
@@ -922,19 +1248,27 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	public void setSiardTables(List<SiardTable> siardTables) {
 		this.siardTables = siardTables;
 	}
-
+	/**
+	 * @param siardTables the siardTables to set
+	 */
 	public Document getMetadataXMLDocument() {
 		return metadataXMLDocument;
 	}
-
+	/**
+	 * @param siardTables the siardTables to set
+	 */
 	public void setMetadataXMLDocument(Document metadataXMLDocument) {
 		this.metadataXMLDocument = metadataXMLDocument;
 	}
-
+	/**
+	 * @param siardTables the siardTables to set
+	 */
 	public StringBuilder getValidationLog() {
 		return validationLog;
 	}
-
+	/**
+	 * @param siardTables the siardTables to set
+	 */
 	public void setValidationLog(StringBuilder validationLog) {
 		this.validationLog = validationLog;
 	}
