@@ -23,15 +23,16 @@ import ch.kostceco.tools.siardval.exception.module.ValidationKconstraintExceptio
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt K (Constraint-Validierung)
- * Sind die vorgegebenen Constraints valid? 
- *  --> Constraint-Verletzung als Fehler ausgeben
+ * Validierungsschritt K (Constraint-Validierung) Sind die vorgegebenen
+ * Constraints valid? --> Constraint-Verletzung als Fehler ausgeben
+ * 
  * @author ???
  */
 
-public interface ValidationKconstraintModule extends ValidationModule {
+public interface ValidationKconstraintModule extends ValidationModule
+{
 
-    
-    public boolean validate(File siardDatei) throws ValidationKconstraintException;
-    
+	public boolean validate( File siardDatei )
+			throws ValidationKconstraintException;
+
 }

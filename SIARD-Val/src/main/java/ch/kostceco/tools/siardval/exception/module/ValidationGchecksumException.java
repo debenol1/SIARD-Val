@@ -19,19 +19,22 @@ package ch.kostceco.tools.siardval.exception.module;
 
 import ch.kostceco.tools.siardval.exception.SIARDValException;
 
-public class ValidationGchecksumException extends SIARDValException {
+public class ValidationGchecksumException extends SIARDValException
+{
 
-    /**
-     * @author Km Martin Kaiser, KOST-CECO
-     */
-    private static final long serialVersionUID = 5060094531057249403L; //tbd
+	/**
+	 * @author Km Martin Kaiser, KOST-CECO
+	 */
+	private static final long	serialVersionUID	= 5060094531057249403L; // tbd
 
-    public ValidationGchecksumException() {
-        super();
-    }
+	public ValidationGchecksumException()
+	{
+		super();
+	}
 
-    public ValidationGchecksumException(String message) {
-        super(message);
-    }
+	public ValidationGchecksumException( String message )
+	{
+		super( message );
+	}
 
 }

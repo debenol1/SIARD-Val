@@ -24,16 +24,17 @@ import ch.kostceco.tools.siardval.service.MessageService;
 import ch.kostceco.tools.siardval.service.Service;
 
 /**
- * Dies ist das Interface für alle Validierungs-Module und 
- * vereinigt alle Funktionalitäten, die den jeweiligen Modulen
- * gemeinsam sind.
+ * Dies ist das Interface für alle Validierungs-Module und vereinigt alle
+ * Funktionalitäten, die den jeweiligen Modulen gemeinsam sind.
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public interface ValidationModule extends Service {
+public interface ValidationModule extends Service
+{
 
-    public boolean validate(File sipDatei) throws SIARDValException;
-    
-    public MessageService getMessageService();
+	public boolean validate( File sipDatei ) throws SIARDValException;
+
+	public MessageService getMessageService();
 
 }

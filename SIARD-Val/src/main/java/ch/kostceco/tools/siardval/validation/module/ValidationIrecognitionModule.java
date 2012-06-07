@@ -23,15 +23,16 @@ import ch.kostceco.tools.siardval.exception.module.ValidationIrecognitionExcepti
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt I (SIARD-Erkennung)
- * Wird die SIARD-Datei als SIARD erkannt? 
- * valid --> Extension = .siard
+ * Validierungsschritt I (SIARD-Erkennung) Wird die SIARD-Datei als SIARD
+ * erkannt? valid --> Extension = .siard
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public interface ValidationIrecognitionModule extends ValidationModule {
+public interface ValidationIrecognitionModule extends ValidationModule
+{
 
-    
-    public boolean validate(File siardDatei) throws ValidationIrecognitionException;
-    
+	public boolean validate( File siardDatei )
+			throws ValidationIrecognitionException;
+
 }

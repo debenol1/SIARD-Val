@@ -19,16 +19,17 @@ package ch.kostceco.tools.siardval.exception.module;
 
 import ch.kostceco.tools.siardval.exception.SIARDValException;
 
-public class ValidationCheaderException extends SIARDValException {
-
+public class ValidationCheaderException extends SIARDValException
+{
 
 	/**
-     * @author Rc Claire Röthlisberger, KOST-CECO
-     */
-    private static final long serialVersionUID = 6749701283008757910L; //tbd
+	 * @author Rc Claire Röthlisberger, KOST-CECO
+	 */
+	private static final long	serialVersionUID	= 6749701283008757910L; // tbd
 
-    public ValidationCheaderException(String message) {
-        super(message);
-    }
+	public ValidationCheaderException( String message )
+	{
+		super( message );
+	}
 
 }

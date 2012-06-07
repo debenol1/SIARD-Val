@@ -23,15 +23,17 @@ import ch.kostceco.tools.siardval.exception.module.ValidationJsurplusFilesExcept
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt J (Zusätzliche Primärdateien)
- * Enthält der content-Ordner Dateien oder Ordner die nicht in metadata.xml beschrieben sind ?
- * invalid --> Zusätzliche Ordner oder Dateien im content-Ordner 
+ * Validierungsschritt J (Zusätzliche Primärdateien) Enthält der content-Ordner
+ * Dateien oder Ordner die nicht in metadata.xml beschrieben sind ? invalid -->
+ * Zusätzliche Ordner oder Dateien im content-Ordner
+ * 
  * @author Sp Peter Schneider
  */
 
-public interface ValidationJsurplusFilesModule extends ValidationModule {
+public interface ValidationJsurplusFilesModule extends ValidationModule
+{
 
-    
-    public boolean validate(File siardDatei) throws ValidationJsurplusFilesException;
-    
+	public boolean validate( File siardDatei )
+			throws ValidationJsurplusFilesException;
+
 }

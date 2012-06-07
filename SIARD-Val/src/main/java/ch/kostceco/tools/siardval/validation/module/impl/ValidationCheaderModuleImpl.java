@@ -38,203 +38,248 @@ import ch.enterag.utils.zip.FileEntry;
 import ch.enterag.utils.zip.Zip64File;
 
 /**
- * Validierungsschritt C (Header-Validierung)
- * Ist der header-Ordner valid? 
- * valid --> metadata.xml	valid zu	metadata.xsd 	und beides vorhanden
- * valid --> metadata.xml	valid zu 	original metadata.xsd
- * Bemerkung --> zusätzliche Ordner oder Dateien wie z.B. metadata.xls sind im header-Ordner erlaubt
- * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
+ * Validierungsschritt C (Header-Validierung) Ist der header-Ordner valid? valid
+ * --> metadata.xml valid zu metadata.xsd und beides vorhanden valid -->
+ * metadata.xml valid zu original metadata.xsd Bemerkung --> zusätzliche Ordner
+ * oder Dateien wie z.B. metadata.xls sind im header-Ordner erlaubt ==> Bei den
+ * Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat
+ * invalid sein!
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public class ValidationCheaderModuleImpl extends ValidationModuleImpl implements ValidationCheaderModule {
+public class ValidationCheaderModuleImpl extends ValidationModuleImpl implements
+		ValidationCheaderModule
+{
 
-    public ConfigurationService configurationService;
-    
+	public ConfigurationService	configurationService;
 
-    public ConfigurationService getConfigurationService() {
-        return configurationService;
-    }
+	public ConfigurationService getConfigurationService()
+	{
+		return configurationService;
+	}
 
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
+	public void setConfigurationService(
+			ConfigurationService configurationService )
+	{
+		this.configurationService = configurationService;
+	}
 
+	@Override
+	public boolean validate( File siardDatei )
+			throws ValidationCheaderException
+	{
 
-    @Override
-    public boolean validate(File siardDatei) throws ValidationCheaderException {
-    	
-        // Sind im Header-Ordner metadata.xml und metadata.xsd vorhanden?
-        FileEntry metadataxml = null;        
-        FileEntry metadataxsd = null;
-        
-         try {
-            Zip64File zipfile = new Zip64File(siardDatei);
-            List<FileEntry> fileEntryList = zipfile.getListFileEntries();
-            for (FileEntry fileEntry : fileEntryList) {
-                if (fileEntry.getName().equals("header/" + METADATA)) {
-                    metadataxml = fileEntry;
-                }
-                if (fileEntry.getName().equals("header/" + XSD_METADATA)) {
-                    metadataxsd = fileEntry;
-                }
-            }
-            if (metadataxml == null) {
-                // keine metadata.xml = METADATA in der SIARD-Datei gefunden
-                getMessageService().logError(
-                        getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                        getTextResourceService().getText(MESSAGE_DASHES) + 
-                        getTextResourceService().getText(MESSAGE_MODULE_C_NOMETADATAFOUND));                                
-                return false;
-            }
-            if (metadataxsd == null) {
-                // keine metadata.xsd = XSD_METADATA in der SIARD-Datei gefunden
-                getMessageService().logError(
-                        getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                        getTextResourceService().getText(MESSAGE_DASHES) + 
-                        getTextResourceService().getText(MESSAGE_MODULE_C_NOMETADATAXSD));                                
-                return false;
-            }
-        } catch (Exception e) {
-            getMessageService().logError(
-                    getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                    getTextResourceService().getText(MESSAGE_DASHES) + 
-                    e.getMessage() + " xml und xsd");                
-            return false;
-        }
-        
-        // Validierung metadata.xml mit metadata.xsd
-        File xmlToValidate = null;
-        File xsdToValidate = null;
-        String toplevelDir = siardDatei.getName();
-        int lastDotIdx = toplevelDir.lastIndexOf(".");
-        toplevelDir = toplevelDir.substring(0, lastDotIdx);
-        
-        try {
-            // Arbeitsverzeichnis zum Entpacken des Archivs erstellen
-            String pathToWorkDir = getConfigurationService().getPathToWorkDir();
-            /** Nicht vergessen in "src/main/resources/config/applicationContext-services.xml"
-             *  beim entsprechenden Modul die property anzugeben:
-             *  <property name="configurationService" ref="configurationService" />
-             */
-            File tmpDir = new File(pathToWorkDir);
-            if (!tmpDir.exists()) {
-                tmpDir.mkdir();
-            } 
+		// Sind im Header-Ordner metadata.xml und metadata.xsd vorhanden?
+		FileEntry metadataxml = null;
+		FileEntry metadataxsd = null;
 
-            // Das metadata.xml und sein xsd müssen in das Filesystem extrahiert werden, weil bei
-            // bei Verwendung eines Inputstreams bei der Validierung ein Problem mit
-            // den xs:include Statements besteht, die includes können so nicht aufgelöst werden.
-            // Es werden hier jedoch nicht nur diese Files extrahiert, sondern gleich die ganze Zip-Datei,
-            // weil auch spätere Validierungen nur mit den extrahierten Files arbeiten können.
-            Zip64File zipfile = new Zip64File(siardDatei);
-            List<FileEntry> fileEntryList = zipfile.getListFileEntries();
-            for (FileEntry fileEntry : fileEntryList) {
-                if (!fileEntry.isDirectory()) {
-                    byte[] buffer = new byte[8192];
-                    // Scheibe die Datei an den richtigen Ort respektive in den richtigen Ordner der ggf angelegt werden muss.
-                    EntryInputStream eis = zipfile.openEntryInputStream(fileEntry.getName());
-                    File newFile = new File(tmpDir, fileEntry.getName());
-                    File parent = newFile.getParentFile();
-                    if (!parent.exists()) {
-                        parent.mkdirs();
-                    }
-                    FileOutputStream fos = new FileOutputStream(newFile);
-                    for (int iRead = eis.read(buffer); iRead >= 0; iRead = eis.read(buffer)){
-                        fos.write(buffer, 0, iRead);
-                    }
-                    eis.close();
-                    fos.close();
-                    // Festhalten von metadata.xml und metadata.xsd
-                    if (newFile.getName().endsWith(METADATA)) {
-                        xmlToValidate = newFile;
-                    }
-                    if (newFile.getName().endsWith(XSD_METADATA)) {
-                        xsdToValidate = newFile;
-                    }
-                }
-            }
-            if (xmlToValidate != null && xsdToValidate != null) {
-            	// der andere Fall wurde bereits oben abgefangen
-                try {
-                	// Validierung von metadata.xml und metadata.xsd mit dem (private class) Validator
-                    System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
-                            "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
-                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                    factory.setNamespaceAware(true);
-                    factory.setValidating(true);
-                    factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
-                            "http://www.w3.org/2001/XMLSchema");
-                    factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaSource", xsdToValidate.getAbsolutePath());
-                    DocumentBuilder builder = factory.newDocumentBuilder();
-                    Validator handler = new Validator();
-                    builder.setErrorHandler(handler);
-                    builder.parse(xmlToValidate.getAbsolutePath());
-                    if (handler.validationError == true){
-                        return false;
-                    }
-                } catch (java.io.IOException ioe) {
-            		getMessageService().logError(
-                            getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                            getTextResourceService().getText(MESSAGE_DASHES) + 
-                            "IOException " + 
-                            ioe.getMessage());                
-                } catch (SAXException e) {
-                   getMessageService().logError(
-                            getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                            getTextResourceService().getText(MESSAGE_DASHES) + 
-                            "SAXException " + 
-                            e.getMessage());                
-                } catch (ParserConfigurationException e) {
-                    getMessageService().logError(
-                            getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                            getTextResourceService().getText(MESSAGE_DASHES) + 
-                            "ParserConfigurationException " + 
-                            e.getMessage());                
-                }
-            }
-            zipfile.close();
-        } catch (Exception e) {
-            getMessageService().logError(
-                    getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                    getTextResourceService().getText(MESSAGE_DASHES) + 
-                    e.getMessage());                
-            return false;
-        }
-        
-    	// Ist metadata.xsd logisch gleich wie original metadata.xsd
-        /** TODO: Original metadata.xsd: MD5 = f8b9ea8ee65aba41d7a9853046eff6cc 
-         *  Kein Framework bekannt der einen logischen Vergleich machen könnte. Ensprechend wird 
-         *  hier als erstes geprüft ob metadata.xsd in der SIARD-Datei gleich ist wie die original
-         *  metadata.xsd mit einem MD5 Hash von f8b9ea8ee65aba41d7a9853046eff6cc.
-         *  Sollten die XSD-Dateien nicht identisch sein, erfolgt eine Validierung mit Hilfe der  
-         *  original metadata.xsd. */
+		try {
+			Zip64File zipfile = new Zip64File( siardDatei );
+			List<FileEntry> fileEntryList = zipfile.getListFileEntries();
+			for ( FileEntry fileEntry : fileEntryList ) {
+				if ( fileEntry.getName().equals( "header/" + METADATA ) ) {
+					metadataxml = fileEntry;
+				}
+				if ( fileEntry.getName().equals( "header/" + XSD_METADATA ) ) {
+					metadataxsd = fileEntry;
+				}
+			}
+			if ( metadataxml == null ) {
+				// keine metadata.xml = METADATA in der SIARD-Datei gefunden
+				getMessageService().logError(
+						getTextResourceService().getText( MESSAGE_MODULE_C )
+								+ getTextResourceService().getText(
+										MESSAGE_DASHES )
+								+ getTextResourceService().getText(
+										MESSAGE_MODULE_C_NOMETADATAFOUND ) );
+				return false;
+			}
+			if ( metadataxsd == null ) {
+				// keine metadata.xsd = XSD_METADATA in der SIARD-Datei gefunden
+				getMessageService().logError(
+						getTextResourceService().getText( MESSAGE_MODULE_C )
+								+ getTextResourceService().getText(
+										MESSAGE_DASHES )
+								+ getTextResourceService().getText(
+										MESSAGE_MODULE_C_NOMETADATAXSD ) );
+				return false;
+			}
+		} catch ( Exception e ) {
+			getMessageService().logError(
+					getTextResourceService().getText( MESSAGE_MODULE_C )
+							+ getTextResourceService().getText( MESSAGE_DASHES )
+							+ e.getMessage() + " xml und xsd" );
+			return false;
+		}
 
+		// Validierung metadata.xml mit metadata.xsd
+		File xmlToValidate = null;
+		File xsdToValidate = null;
+		String toplevelDir = siardDatei.getName();
+		int lastDotIdx = toplevelDir.lastIndexOf( "." );
+		toplevelDir = toplevelDir.substring( 0, lastDotIdx );
 
-        return true;
-    }
-    
-    private class Validator extends DefaultHandler {
-        public boolean validationError = false;
-        public SAXParseException saxParseException = null;
-        public void error(SAXParseException exception) throws SAXException {
-            validationError = true;
-            saxParseException = exception;            
-            getMessageService().logError(
-                    getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                    getTextResourceService().getText(MESSAGE_DASHES) + 
-                    getTextResourceService().getText(MESSAGE_MODULE_C_METADATA_ERRORS, saxParseException.getLineNumber(), saxParseException.getColumnNumber(), saxParseException.getMessage()));                
-        }
-        public void fatalError(SAXParseException exception) throws SAXException {
-            validationError = true;
-            saxParseException = exception;
-            getMessageService().logError(
-                    getTextResourceService().getText(MESSAGE_MODULE_C) + 
-                    getTextResourceService().getText(MESSAGE_DASHES) + 
-                    getTextResourceService().getText(MESSAGE_MODULE_C_METADATA_ERRORS, saxParseException.getLineNumber(), saxParseException.getColumnNumber(), saxParseException.getMessage()));                
-        }
-        public void warning(SAXParseException exception) throws SAXException {
-        	// Warnungen werden nicht ausgegeben
-        }
-    }
+		try {
+			// Arbeitsverzeichnis zum Entpacken des Archivs erstellen
+			String pathToWorkDir = getConfigurationService().getPathToWorkDir();
+			/**
+			 * Nicht vergessen in
+			 * "src/main/resources/config/applicationContext-services.xml" beim
+			 * entsprechenden Modul die property anzugeben: <property
+			 * name="configurationService" ref="configurationService" />
+			 */
+			File tmpDir = new File( pathToWorkDir );
+			if ( !tmpDir.exists() ) {
+				tmpDir.mkdir();
+			}
+
+			// Das metadata.xml und sein xsd müssen in das Filesystem extrahiert
+			// werden, weil bei
+			// bei Verwendung eines Inputstreams bei der Validierung ein Problem
+			// mit
+			// den xs:include Statements besteht, die includes können so nicht
+			// aufgelöst werden.
+			// Es werden hier jedoch nicht nur diese Files extrahiert, sondern
+			// gleich die ganze Zip-Datei,
+			// weil auch spätere Validierungen nur mit den extrahierten Files
+			// arbeiten können.
+			Zip64File zipfile = new Zip64File( siardDatei );
+			List<FileEntry> fileEntryList = zipfile.getListFileEntries();
+			for ( FileEntry fileEntry : fileEntryList ) {
+				if ( !fileEntry.isDirectory() ) {
+					byte[] buffer = new byte[8192];
+					// Scheibe die Datei an den richtigen Ort respektive in den
+					// richtigen Ordner der ggf angelegt werden muss.
+					EntryInputStream eis = zipfile
+							.openEntryInputStream( fileEntry.getName() );
+					File newFile = new File( tmpDir, fileEntry.getName() );
+					File parent = newFile.getParentFile();
+					if ( !parent.exists() ) {
+						parent.mkdirs();
+					}
+					FileOutputStream fos = new FileOutputStream( newFile );
+					for ( int iRead = eis.read( buffer ); iRead >= 0; iRead = eis
+							.read( buffer ) ) {
+						fos.write( buffer, 0, iRead );
+					}
+					eis.close();
+					fos.close();
+					// Festhalten von metadata.xml und metadata.xsd
+					if ( newFile.getName().endsWith( METADATA ) ) {
+						xmlToValidate = newFile;
+					}
+					if ( newFile.getName().endsWith( XSD_METADATA ) ) {
+						xsdToValidate = newFile;
+					}
+				}
+			}
+			if ( xmlToValidate != null && xsdToValidate != null ) {
+				// der andere Fall wurde bereits oben abgefangen
+				try {
+					// Validierung von metadata.xml und metadata.xsd mit dem
+					// (private class) Validator
+					System.setProperty(
+							"javax.xml.parsers.DocumentBuilderFactory",
+							"org.apache.xerces.jaxp.DocumentBuilderFactoryImpl" );
+					DocumentBuilderFactory factory = DocumentBuilderFactory
+							.newInstance();
+					factory.setNamespaceAware( true );
+					factory.setValidating( true );
+					factory.setAttribute(
+							"http://java.sun.com/xml/jaxp/properties/schemaLanguage",
+							"http://www.w3.org/2001/XMLSchema" );
+					factory.setAttribute(
+							"http://java.sun.com/xml/jaxp/properties/schemaSource",
+							xsdToValidate.getAbsolutePath() );
+					DocumentBuilder builder = factory.newDocumentBuilder();
+					Validator handler = new Validator();
+					builder.setErrorHandler( handler );
+					builder.parse( xmlToValidate.getAbsolutePath() );
+					if ( handler.validationError == true ) {
+						return false;
+					}
+				} catch ( java.io.IOException ioe ) {
+					getMessageService().logError(
+							getTextResourceService().getText( MESSAGE_MODULE_C )
+									+ getTextResourceService().getText(
+											MESSAGE_DASHES ) + "IOException "
+									+ ioe.getMessage() );
+				} catch ( SAXException e ) {
+					getMessageService().logError(
+							getTextResourceService().getText( MESSAGE_MODULE_C )
+									+ getTextResourceService().getText(
+											MESSAGE_DASHES ) + "SAXException "
+									+ e.getMessage() );
+				} catch ( ParserConfigurationException e ) {
+					getMessageService().logError(
+							getTextResourceService().getText( MESSAGE_MODULE_C )
+									+ getTextResourceService().getText(
+											MESSAGE_DASHES )
+									+ "ParserConfigurationException "
+									+ e.getMessage() );
+				}
+			}
+			zipfile.close();
+		} catch ( Exception e ) {
+			getMessageService().logError(
+					getTextResourceService().getText( MESSAGE_MODULE_C )
+							+ getTextResourceService().getText( MESSAGE_DASHES )
+							+ e.getMessage() );
+			return false;
+		}
+
+		// Ist metadata.xsd logisch gleich wie original metadata.xsd
+		/**
+		 * TODO: Original metadata.xsd: MD5 = f8b9ea8ee65aba41d7a9853046eff6cc
+		 * Kein Framework bekannt der einen logischen Vergleich machen könnte.
+		 * Ensprechend wird hier als erstes geprüft ob metadata.xsd in der
+		 * SIARD-Datei gleich ist wie die original metadata.xsd mit einem MD5
+		 * Hash von f8b9ea8ee65aba41d7a9853046eff6cc. Sollten die XSD-Dateien
+		 * nicht identisch sein, erfolgt eine Validierung mit Hilfe der original
+		 * metadata.xsd.
+		 */
+
+		return true;
+	}
+
+	private class Validator extends DefaultHandler
+	{
+		public boolean				validationError		= false;
+		public SAXParseException	saxParseException	= null;
+
+		public void error( SAXParseException exception ) throws SAXException
+		{
+			validationError = true;
+			saxParseException = exception;
+			getMessageService().logError(
+					getTextResourceService().getText( MESSAGE_MODULE_C )
+							+ getTextResourceService().getText( MESSAGE_DASHES )
+							+ getTextResourceService().getText(
+									MESSAGE_MODULE_C_METADATA_ERRORS,
+									saxParseException.getLineNumber(),
+									saxParseException.getColumnNumber(),
+									saxParseException.getMessage() ) );
+		}
+
+		public void fatalError( SAXParseException exception )
+				throws SAXException
+		{
+			validationError = true;
+			saxParseException = exception;
+			getMessageService().logError(
+					getTextResourceService().getText( MESSAGE_MODULE_C )
+							+ getTextResourceService().getText( MESSAGE_DASHES )
+							+ getTextResourceService().getText(
+									MESSAGE_MODULE_C_METADATA_ERRORS,
+									saxParseException.getLineNumber(),
+									saxParseException.getColumnNumber(),
+									saxParseException.getMessage() ) );
+		}
+
+		public void warning( SAXParseException exception ) throws SAXException
+		{
+			// Warnungen werden nicht ausgegeben
+		}
+	}
 }

@@ -19,19 +19,22 @@ package ch.kostceco.tools.siardval.exception.module;
 
 import ch.kostceco.tools.siardval.exception.SIARDValException;
 
-public class ValidationEcolumnException extends SIARDValException {
+public class ValidationEcolumnException extends SIARDValException
+{
 
-    /**
-     * @author ???
-     */
-    private static final long serialVersionUID = 5060094531057249403L; //tbd
+	/**
+	 * @author ???
+	 */
+	private static final long	serialVersionUID	= 5060094531057249403L; // tbd
 
-    public ValidationEcolumnException() {
-        super();
-    }
+	public ValidationEcolumnException()
+	{
+		super();
+	}
 
-    public ValidationEcolumnException(String message) {
-        super(message);
-    }
+	public ValidationEcolumnException( String message )
+	{
+		super( message );
+	}
 
 }

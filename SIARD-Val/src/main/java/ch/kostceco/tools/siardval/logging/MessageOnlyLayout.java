@@ -23,19 +23,23 @@ import org.apache.log4j.spi.LoggingEvent;
 /**
  * logging -->
  * 
- * Erzeugt ein vollkommen "nacktes" Layout, welches nichts als die eigentliche Message enthält.
- * @author Rc Claire Röthlisberger, KOST-CECO 
+ * Erzeugt ein vollkommen "nacktes" Layout, welches nichts als die eigentliche
+ * Message enthält.
+ * 
+ * @author Rc Claire Röthlisberger, KOST-CECO
  */
-public class MessageOnlyLayout extends SimpleLayout {
+public class MessageOnlyLayout extends SimpleLayout
+{
 
-    StringBuffer sbuf = new StringBuffer(128);
+	StringBuffer	sbuf	= new StringBuffer( 128 );
 
-    @Override
-    public String format(LoggingEvent event) {
-        sbuf.setLength(0);
-        sbuf.append(event.getRenderedMessage());
-        sbuf.append(LINE_SEP);
-        return sbuf.toString();
-    }
+	@Override
+	public String format( LoggingEvent event )
+	{
+		sbuf.setLength( 0 );
+		sbuf.append( event.getRenderedMessage() );
+		sbuf.append( LINE_SEP );
+		return sbuf.toString();
+	}
 
 }

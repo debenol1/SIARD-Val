@@ -23,19 +23,20 @@ import ch.kostceco.tools.siardval.exception.module.ValidationBprimaryStructureEx
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt B (primäre Verzeichnisstruktur)
- * Besteht eine korrekte primäre Verzeichnisstruktur? 
- * valid --> [Name].siard/header und [Name].siard/content
- * invalid --> [Name].siard/[Name]/header und [Name].siard/[Name]/content
- * invalid --> Andere Ordner oder Dateien sind im Toplevel-Ordner
- * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
+ * Validierungsschritt B (primäre Verzeichnisstruktur) Besteht eine korrekte
+ * primäre Verzeichnisstruktur? valid --> [Name].siard/header und
+ * [Name].siard/content invalid --> [Name].siard/[Name]/header und
+ * [Name].siard/[Name]/content invalid --> Andere Ordner oder Dateien sind im
+ * Toplevel-Ordner ==> Bei den Module A, B, C und D wird die Validierung
+ * abgebrochen, sollte das Resulat invalid sein!
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public interface ValidationBprimaryStructureModule extends ValidationModule {
+public interface ValidationBprimaryStructureModule extends ValidationModule
+{
 
-    
-    public boolean validate(File siardDatei) throws ValidationBprimaryStructureException;
-   
+	public boolean validate( File siardDatei )
+			throws ValidationBprimaryStructureException;
 
 }

@@ -23,16 +23,19 @@ package ch.kostceco.tools.siardval.exception;
  * Superklasse aller Applikations-Exceptions
  */
 
-public class SIARDValException extends Exception {
+public class SIARDValException extends Exception
+{
 
-    private static final long serialVersionUID = -8666753675661449719L;
+	private static final long	serialVersionUID	= -8666753675661449719L;
 
-    public SIARDValException() {
-        super();
-    }
+	public SIARDValException()
+	{
+		super();
+	}
 
-    public SIARDValException(String message) {
-        super(message);
-    }
+	public SIARDValException( String message )
+	{
+		super( message );
+	}
 
 }

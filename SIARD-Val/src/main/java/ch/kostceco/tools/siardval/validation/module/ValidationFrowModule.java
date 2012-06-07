@@ -23,17 +23,18 @@ import ch.kostceco.tools.siardval.exception.module.ValidationFrowException;
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt F (Zeilen-Validierung)
- * Wurden die Angaben aus metadata.xml korrekt in die tableZ.xsd-Dateien übertragen?
- * valid --> gleiche Zeilenzahl	(rows in metadata.xml = max = minOccurs in tableZ.xsd
- * Ansonsten: Enthält tableZ.xml die gleiche Anzahl Zeilen wie in metadata.xml definiert?
- * valid --> gleiche Zeilenzahl	(rows in metadata.xml = Anzahl row in tableZ.xml
+ * Validierungsschritt F (Zeilen-Validierung) Wurden die Angaben aus
+ * metadata.xml korrekt in die tableZ.xsd-Dateien übertragen? valid --> gleiche
+ * Zeilenzahl (rows in metadata.xml = max = minOccurs in tableZ.xsd Ansonsten:
+ * Enthält tableZ.xml die gleiche Anzahl Zeilen wie in metadata.xml definiert?
+ * valid --> gleiche Zeilenzahl (rows in metadata.xml = Anzahl row in tableZ.xml
+ * 
  * @author Do Olivier Debenath
  */
 
-public interface ValidationFrowModule extends ValidationModule {
+public interface ValidationFrowModule extends ValidationModule
+{
 
-    
-    public boolean validate(File siardDatei) throws ValidationFrowException;
-    
+	public boolean validate( File siardDatei ) throws ValidationFrowException;
+
 }

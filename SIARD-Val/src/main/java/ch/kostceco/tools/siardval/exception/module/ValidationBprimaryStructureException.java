@@ -19,19 +19,22 @@ package ch.kostceco.tools.siardval.exception.module;
 
 import ch.kostceco.tools.siardval.exception.SIARDValException;
 
-public class ValidationBprimaryStructureException extends SIARDValException {
+public class ValidationBprimaryStructureException extends SIARDValException
+{
 
-    /**
-     * @author Rc Claire Röthlisberger, KOST-CECO 
-     */
-    private static final long serialVersionUID = -5743334009406087977L;
+	/**
+	 * @author Rc Claire Röthlisberger, KOST-CECO
+	 */
+	private static final long	serialVersionUID	= -5743334009406087977L;
 
-    public ValidationBprimaryStructureException() {
-        super();
-    }
+	public ValidationBprimaryStructureException()
+	{
+		super();
+	}
 
-    public ValidationBprimaryStructureException(String message) {
-        super(message);
-    }
+	public ValidationBprimaryStructureException( String message )
+	{
+		super( message );
+	}
 
 }

@@ -23,16 +23,18 @@ import ch.kostceco.tools.siardval.exception.module.ValidationAzipException;
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt A (Lesbarkeit)
- * Kann die SIARD-Datei gelesen werden? 
- * valid --> lesbare und nicht passwortgeschützte ZIP-Datei oder ZIP64-Datei 
- * valid --> unkomprimierte ZIP64-Datei oder unkomprimierte ZIP-Datei
- * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
+ * Validierungsschritt A (Lesbarkeit) Kann die SIARD-Datei gelesen werden? valid
+ * --> lesbare und nicht passwortgeschützte ZIP-Datei oder ZIP64-Datei valid -->
+ * unkomprimierte ZIP64-Datei oder unkomprimierte ZIP-Datei ==> Bei den Module
+ * A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid
+ * sein!
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public interface ValidationAzipModule extends ValidationModule {
+public interface ValidationAzipModule extends ValidationModule
+{
 
-    public boolean validate(File siardDatei) throws ValidationAzipException;
-    
+	public boolean validate( File siardDatei ) throws ValidationAzipException;
+
 }

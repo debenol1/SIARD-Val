@@ -27,77 +27,96 @@ import ch.enterag.utils.zip.FileEntry;
 import ch.enterag.utils.zip.Zip64File;
 
 /**
- * Validierungsschritt B (primäre Verzeichnisstruktur)
- * Besteht eine korrekte primäre Verzeichnisstruktur? 
- * valid --> [Name].siard/header und [Name].siard/content
- * invalid --> [Name].siard/[Name]/header und [Name].siard/[Name]/content
- * invalid --> Andere Ordner oder Dateien im Toplevel-Ordner
- * ==> Bei den Module A, B, C und D wird die Validierung abgebrochen, sollte das Resulat invalid sein!
+ * Validierungsschritt B (primäre Verzeichnisstruktur) Besteht eine korrekte
+ * primäre Verzeichnisstruktur? valid --> [Name].siard/header und
+ * [Name].siard/content invalid --> [Name].siard/[Name]/header und
+ * [Name].siard/[Name]/content invalid --> Andere Ordner oder Dateien im
+ * Toplevel-Ordner ==> Bei den Module A, B, C und D wird die Validierung
+ * abgebrochen, sollte das Resulat invalid sein!
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public class ValidationBprimaryStructureModuleImpl extends ValidationModuleImpl implements
-        ValidationBprimaryStructureModule {
+public class ValidationBprimaryStructureModuleImpl extends ValidationModuleImpl
+		implements ValidationBprimaryStructureModule
+{
 
-    @Override
-    public boolean validate(File siardDatei) throws ValidationBprimaryStructureException {
-    	
-        Integer bExistsHeaderFolder = 0;
-        Integer bExistsContentFolder = 0;
-        
-        String toplevelDir = siardDatei.getName();
-        int lastDotIdx = toplevelDir.lastIndexOf(".");
-        toplevelDir = toplevelDir.substring(0, lastDotIdx);
-        
-        try {
-           
-            Zip64File zipfile = new Zip64File(siardDatei);
-            List<FileEntry> fileEntryList = zipfile.getListFileEntries();
-            for (FileEntry fileEntry : fileEntryList) {
-            	
-            	// nur valid wenn es mit header oder content anfängt
-                // dies schliesst auch [Name].siard/[Name]/header und [Name].siard/[Name]/content mit ein
-                String name = fileEntry.getName();
-                if (name.startsWith("content/")) {
-                	// erlaubter Inhalt content/...
-                	bExistsContentFolder = 1;
-                } else {
-                	if (name.startsWith("header/")) {
-                		// erlaubter Inhalt header/...
-                		bExistsHeaderFolder = 1;
-                	} else {
-                    	// keines der beiden validen Möglichkeiten -> Fehler
-                    	getMessageService().logError(
-                                getTextResourceService().getText(MESSAGE_MODULE_B) + 
-                                getTextResourceService().getText(MESSAGE_DASHES) + 
-                                getTextResourceService().getText(MESSAGE_MODULE_B_NOTALLOWEDFILE, name));
-                        // SIARD enthaelt ein File, das sich nicht dort befinden duerfte: {0}
-                        return false;
-                	}
-                }
-            }
-            zipfile.close();
-            if (bExistsContentFolder == 0){
-            	getMessageService().logError(
-                        getTextResourceService().getText(MESSAGE_MODULE_B) + 
-                        getTextResourceService().getText(MESSAGE_DASHES) + 
-                        getTextResourceService().getText(MESSAGE_MODULE_B_CONTENT));
-                // SIARD enthaelt kein content-Ordner
-                return false;
-            }
-            if (bExistsHeaderFolder == 0){
-            	getMessageService().logError(
-                        getTextResourceService().getText(MESSAGE_MODULE_B) + 
-                        getTextResourceService().getText(MESSAGE_DASHES) + 
-                        getTextResourceService().getText(MESSAGE_MODULE_B_HEADER));
-                // SIARD enthaelt kein header-Ordner
-                return false;
-            }
-        } catch (Exception e) {
-            getMessageService().logError(getTextResourceService().getText(MESSAGE_MODULE_B) + 
-                    getTextResourceService().getText(MESSAGE_DASHES) + e.getMessage());                
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean validate( File siardDatei )
+			throws ValidationBprimaryStructureException
+	{
+
+		Integer bExistsHeaderFolder = 0;
+		Integer bExistsContentFolder = 0;
+
+		String toplevelDir = siardDatei.getName();
+		int lastDotIdx = toplevelDir.lastIndexOf( "." );
+		toplevelDir = toplevelDir.substring( 0, lastDotIdx );
+
+		try {
+
+			Zip64File zipfile = new Zip64File( siardDatei );
+			List<FileEntry> fileEntryList = zipfile.getListFileEntries();
+			for ( FileEntry fileEntry : fileEntryList ) {
+
+				// nur valid wenn es mit header oder content anfängt
+				// dies schliesst auch [Name].siard/[Name]/header und
+				// [Name].siard/[Name]/content mit ein
+				String name = fileEntry.getName();
+				if ( name.startsWith( "content/" ) ) {
+					// erlaubter Inhalt content/...
+					bExistsContentFolder = 1;
+				} else {
+					if ( name.startsWith( "header/" ) ) {
+						// erlaubter Inhalt header/...
+						bExistsHeaderFolder = 1;
+					} else {
+						// keines der beiden validen Möglichkeiten -> Fehler
+						getMessageService()
+								.logError(
+										getTextResourceService().getText(
+												MESSAGE_MODULE_B )
+												+ getTextResourceService()
+														.getText(
+																MESSAGE_DASHES )
+												+ getTextResourceService()
+														.getText(
+																MESSAGE_MODULE_B_NOTALLOWEDFILE,
+																name ) );
+						// SIARD enthaelt ein File, das sich nicht dort befinden
+						// duerfte: {0}
+						return false;
+					}
+				}
+			}
+			zipfile.close();
+			if ( bExistsContentFolder == 0 ) {
+				getMessageService().logError(
+						getTextResourceService().getText( MESSAGE_MODULE_B )
+								+ getTextResourceService().getText(
+										MESSAGE_DASHES )
+								+ getTextResourceService().getText(
+										MESSAGE_MODULE_B_CONTENT ) );
+				// SIARD enthaelt kein content-Ordner
+				return false;
+			}
+			if ( bExistsHeaderFolder == 0 ) {
+				getMessageService().logError(
+						getTextResourceService().getText( MESSAGE_MODULE_B )
+								+ getTextResourceService().getText(
+										MESSAGE_DASHES )
+								+ getTextResourceService().getText(
+										MESSAGE_MODULE_B_HEADER ) );
+				// SIARD enthaelt kein header-Ordner
+				return false;
+			}
+		} catch ( Exception e ) {
+			getMessageService().logError(
+					getTextResourceService().getText( MESSAGE_MODULE_B )
+							+ getTextResourceService().getText( MESSAGE_DASHES )
+							+ e.getMessage() );
+			return false;
+		}
+		return true;
+	}
 }

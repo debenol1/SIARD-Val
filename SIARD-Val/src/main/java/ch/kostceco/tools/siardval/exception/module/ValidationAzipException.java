@@ -19,15 +19,17 @@ package ch.kostceco.tools.siardval.exception.module;
 
 import ch.kostceco.tools.siardval.exception.SIARDValException;
 
-public class ValidationAzipException extends SIARDValException {
+public class ValidationAzipException extends SIARDValException
+{
 
-    /**
-     * @author Rc Claire Röthlisberger, KOST-CECO 
-     */
-    private static final long serialVersionUID = -8816841335398903517L;
+	/**
+	 * @author Rc Claire Röthlisberger, KOST-CECO
+	 */
+	private static final long	serialVersionUID	= -8816841335398903517L;
 
-    public ValidationAzipException(String message) {
-        super(message);
-    }
+	public ValidationAzipException( String message )
+	{
+		super( message );
+	}
 
 }

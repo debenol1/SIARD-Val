@@ -17,24 +17,31 @@ Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
 
 package ch.kostceco.tools.siardval.service;
 
-
 /**
  * Interface für den Message Stack Service.
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
-public interface MessageService extends Service {
-    
-    final static String ERROR = "0";
-    final static String FATAL = "1";
-    final static String INFO = "2";
-    final static String WARN = "3";
-    final static String DEBUG = "4";
+public interface MessageService extends Service
+{
 
-    void logInfo(String message);
-    void logDebug(String message);
-    void logWarning(String message);
-    void logError(String message);
-    void logFatal(String message);
-    void clear();
-    void print();
+	final static String	ERROR	= "0";
+	final static String	FATAL	= "1";
+	final static String	INFO	= "2";
+	final static String	WARN	= "3";
+	final static String	DEBUG	= "4";
+
+	void logInfo( String message );
+
+	void logDebug( String message );
+
+	void logWarning( String message );
+
+	void logError( String message );
+
+	void logFatal( String message );
+
+	void clear();
+
+	void print();
 }

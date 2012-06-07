@@ -15,13 +15,13 @@ if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth F
 Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
 ==================================================================================================*/
 
-
 package ch.kostceco.tools.siardval.service;
 
 import ch.kostceco.tools.siardval.logging.MessageConstants;
 
-public interface Service extends MessageConstants {
+public interface Service extends MessageConstants
+{
 
-    // Marker Interface
-    
+	// Marker Interface
+
 }

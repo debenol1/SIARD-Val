@@ -48,397 +48,460 @@ import ch.kostceco.tools.siardval.validation.module.ValidationJsurplusFilesModul
  * eingebunden.
  */
 
-public class Controller implements MessageConstants {
+public class Controller implements MessageConstants
+{
 
-    private static final Logger LOGGER = new Logger(Controller.class);
-    private TextResourceService textResourceService;
-    
-    private ValidationAzipModule validationAzipModule;
-    private ValidationBprimaryStructureModule validationBprimaryStructureModule;
-    private ValidationCheaderModule validationCheaderModule;
-    private ValidationDstructureModule validationDstructureModule;
-//    private ValidationEcolumnModule validationEcolumnModule;
-//    private ValidationFrowModule validationFrowModule;
-//  private ValidationGchecksumModule validationGchecksumModule;
-    private ValidationHcontentModule validationHcontentModule;
-    private ValidationIrecognitionModule validationIrecognitionModule;
-    private ValidationJsurplusFilesModule validationJsurplusFilesModule;
-//    private ValidationKconstraintModule validationKconstraintModule;
+	private static final Logger					LOGGER	= new Logger(
+																Controller.class );
+	private TextResourceService					textResourceService;
 
+	private ValidationAzipModule				validationAzipModule;
+	private ValidationBprimaryStructureModule	validationBprimaryStructureModule;
+	private ValidationCheaderModule				validationCheaderModule;
+	private ValidationDstructureModule			validationDstructureModule;
+	// private ValidationEcolumnModule validationEcolumnModule;
+	// private ValidationFrowModule validationFrowModule;
+	// private ValidationGchecksumModule validationGchecksumModule;
+	private ValidationHcontentModule			validationHcontentModule;
+	private ValidationIrecognitionModule		validationIrecognitionModule;
+	private ValidationJsurplusFilesModule		validationJsurplusFilesModule;
 
-    public ValidationAzipModule getValidationAzipModule() {
-        return validationAzipModule;
-    }
-    public void setValidationAzipModule(ValidationAzipModule validationAzipModule) {
-        this.validationAzipModule = validationAzipModule;
-    }
+	// private ValidationKconstraintModule validationKconstraintModule;
 
-    public ValidationBprimaryStructureModule getValidationBprimaryStructureModule() {
-        return validationBprimaryStructureModule;
-    }
-    public void setValidationBprimaryStructureModule(ValidationBprimaryStructureModule validationBprimaryStructureModule) {
-        this.validationBprimaryStructureModule = validationBprimaryStructureModule;
-    }
-    
-    public ValidationCheaderModule getValidationCheaderModule() {
-        return validationCheaderModule;
-    }
-    public void setValidationCheaderModule(ValidationCheaderModule validationCheaderModule) {
-        this.validationCheaderModule = validationCheaderModule;
-    }
+	public ValidationAzipModule getValidationAzipModule()
+	{
+		return validationAzipModule;
+	}
 
-    public ValidationDstructureModule getValidationDstructureModule() {
-        return validationDstructureModule;
-    }
-    public void setValidationDstructureModule(ValidationDstructureModule validationDstructureModule) {
-        this.validationDstructureModule = validationDstructureModule;
-    }
+	public void setValidationAzipModule(
+			ValidationAzipModule validationAzipModule )
+	{
+		this.validationAzipModule = validationAzipModule;
+	}
 
-/*    public ValidationEcolumnModule getValidationEcolumnModule() {
-        return validationEcolumnModule;
-    }
-    public void setValidationEcolumnModule(ValidationEcolumnModule validationEcolumnModule) {
-        this.validationEcolumnModule = validationEcolumnModule;
-    }*/
+	public ValidationBprimaryStructureModule getValidationBprimaryStructureModule()
+	{
+		return validationBprimaryStructureModule;
+	}
 
-/*    public ValidationFrowModule getValidationFrowModule() {
-        return validationFrowModule;
-    }
-    public void setValidationFrowModule(ValidationFrowModule validationFrowModule) {
-        this.validationFrowModule = validationFrowModule;
-    }*/
+	public void setValidationBprimaryStructureModule(
+			ValidationBprimaryStructureModule validationBprimaryStructureModule )
+	{
+		this.validationBprimaryStructureModule = validationBprimaryStructureModule;
+	}
 
-    /*    public ValidationGchecksumModule getValidationGchecksumModule() {
-    return validationGchecksumModule;
-}
-public void setValidationGchecksumModule(ValidationGchecksumModule validationGchecksumModule) {
-    this.validationGchecksumModule = validationGchecksumModule;
-}*/
+	public ValidationCheaderModule getValidationCheaderModule()
+	{
+		return validationCheaderModule;
+	}
 
-    public ValidationHcontentModule getValidationHcontentModule() {
-        return validationHcontentModule;
-    }
-    public void setValidationHcontentModule(ValidationHcontentModule validationHcontentModule) {
-        this.validationHcontentModule = validationHcontentModule;
-    }
+	public void setValidationCheaderModule(
+			ValidationCheaderModule validationCheaderModule )
+	{
+		this.validationCheaderModule = validationCheaderModule;
+	}
 
-    public ValidationIrecognitionModule getValidationIrecognitionModule() {
-        return validationIrecognitionModule;
-    }
-    public void setValidationIrecognitionModule(ValidationIrecognitionModule validationIrecognitionModule) {
-        this.validationIrecognitionModule = validationIrecognitionModule;
-    }
+	public ValidationDstructureModule getValidationDstructureModule()
+	{
+		return validationDstructureModule;
+	}
 
-    public ValidationJsurplusFilesModule getValidationJsurplusFilesModule() {
-        return validationJsurplusFilesModule;
-    }
-    public void setValidationJsurplusFilesModule(ValidationJsurplusFilesModule validationJsurplusFilesModule) {
-        this.validationJsurplusFilesModule = validationJsurplusFilesModule;
-    }
+	public void setValidationDstructureModule(
+			ValidationDstructureModule validationDstructureModule )
+	{
+		this.validationDstructureModule = validationDstructureModule;
+	}
 
-/*    public ValidationKconstraintModule getValidationKconstraintModule() {
-        return validationKconstraintModule;
-    }
-    public void setValidationKconstraintModule(ValidationKconstraintModule validationKconstraintModule) {
-        this.validationKconstraintModule = validationKconstraintModule;
-    }*/
+	/*
+	 * public ValidationEcolumnModule getValidationEcolumnModule() { return
+	 * validationEcolumnModule; } public void
+	 * setValidationEcolumnModule(ValidationEcolumnModule
+	 * validationEcolumnModule) { this.validationEcolumnModule =
+	 * validationEcolumnModule; }
+	 */
 
+	/*
+	 * public ValidationFrowModule getValidationFrowModule() { return
+	 * validationFrowModule; } public void
+	 * setValidationFrowModule(ValidationFrowModule validationFrowModule) {
+	 * this.validationFrowModule = validationFrowModule; }
+	 */
 
-    public TextResourceService getTextResourceService() {
-        return textResourceService;
-    }
+	/*
+	 * public ValidationGchecksumModule getValidationGchecksumModule() { return
+	 * validationGchecksumModule; } public void
+	 * setValidationGchecksumModule(ValidationGchecksumModule
+	 * validationGchecksumModule) { this.validationGchecksumModule =
+	 * validationGchecksumModule; }
+	 */
 
-    public void setTextResourceService(TextResourceService textResourceService) {
-        this.textResourceService = textResourceService;
-    }
+	public ValidationHcontentModule getValidationHcontentModule()
+	{
+		return validationHcontentModule;
+	}
 
-    
-    public boolean executeMandatory(File siardDatei) {
-        boolean valid = true;
-        
-        // Validation Step A (Lesbarkeit)
-        try {
-            if (this.getValidationAzipModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_A)));
-                this.getValidationAzipModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_A))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_A));
-                // Ein negatives Validierungsresultat in diesem Schritt führt
-                // zum Abbruch der weiteren Verarbeitung
-                this.getValidationAzipModule().getMessageService().print();
-                return false;
-            }
-        } catch (ValidationAzipException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_A), e.getMessage()));
-            this.getValidationAzipModule().getMessageService().print();
-            return false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }
+	public void setValidationHcontentModule(
+			ValidationHcontentModule validationHcontentModule )
+	{
+		this.validationHcontentModule = validationHcontentModule;
+	}
 
-        // Validation Step B (primäre Verzeichnisstruktur)
-        try {
-            if (this.getValidationBprimaryStructureModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_B)));
-                this.getValidationBprimaryStructureModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_B))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_B));
-                // Ein negatives Validierungsresultat in diesem Schritt führt
-                // zum Abbruch der weiteren Verarbeitung
-                this.getValidationBprimaryStructureModule().getMessageService().print();
-                return false;
-            }
-        } catch (ValidationBprimaryStructureException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_B), e.getMessage()));
-            this.getValidationBprimaryStructureModule().getMessageService().print();
-            return false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }
+	public ValidationIrecognitionModule getValidationIrecognitionModule()
+	{
+		return validationIrecognitionModule;
+	}
 
-        // Validation Step C (Header-Validierung)
-        try {
-            if (this.getValidationCheaderModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_C)));
-                this.getValidationCheaderModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_C))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_C));
-                this.getValidationCheaderModule().getMessageService().print();
-                // Ein negatives Validierungsresultat in diesem Schritt führt
-                // zum Abbruch der weiteren Verarbeitung
-                return false;
-            }
-        } catch (ValidationCheaderException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_C), e.getMessage()));
-            this.getValidationCheaderModule().getMessageService().print();
-            return false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }
+	public void setValidationIrecognitionModule(
+			ValidationIrecognitionModule validationIrecognitionModule )
+	{
+		this.validationIrecognitionModule = validationIrecognitionModule;
+	}
 
-        // Validation Step D (Struktur-Validierung)
-        try {
-            if (this.getValidationDstructureModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_D)));
-                this.getValidationDstructureModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_D))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_D));
-                this.getValidationDstructureModule().getMessageService().print();
-                // Ein negatives Validierungsresultat in diesem Schritt führt
-                // zum Abbruch der weiteren Verarbeitung
-                return false;
-            }
-        } catch (ValidationDstructureException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_D), e.getMessage()));
-            this.getValidationDstructureModule().getMessageService().print();
-            return false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }
+	public ValidationJsurplusFilesModule getValidationJsurplusFilesModule()
+	{
+		return validationJsurplusFilesModule;
+	}
 
-        return valid;
-    }
-    
-    public boolean executeOptional(File siardDatei) {
-        boolean valid = true;
+	public void setValidationJsurplusFilesModule(
+			ValidationJsurplusFilesModule validationJsurplusFilesModule )
+	{
+		this.validationJsurplusFilesModule = validationJsurplusFilesModule;
+	}
 
-/*        // Validation Step E (Spalten-Validierung)
-        try {
-            if (this.getValidationEcolumnModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_E)));
-                this.getValidationEcolumnModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_E))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_E));
-                this.getValidationEcolumnModule().getMessageService().print();
-                valid = false;
-            }
-        } catch (ValidationEcolumnException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_E), e.getMessage()));
-            this.getValidationEcolumnModule().getMessageService().print();
-            valid = false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }*/
+	/*
+	 * public ValidationKconstraintModule getValidationKconstraintModule() {
+	 * return validationKconstraintModule; } public void
+	 * setValidationKconstraintModule(ValidationKconstraintModule
+	 * validationKconstraintModule) { this.validationKconstraintModule =
+	 * validationKconstraintModule; }
+	 */
 
+	public TextResourceService getTextResourceService()
+	{
+		return textResourceService;
+	}
 
-/*        // Validation Step F (Zeilen-Validierung)
-        try {
-            if (this.getValidationFrowModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_F)));
-                this.getValidationFrowModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_F))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_F));
-                this.getValidationGrowModule().getMessageService().print();
-                valid = false;
-            }
-        } catch (ValidationFrowException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_F), e.getMessage()));
-            this.getValidationFrowModule().getMessageService().print();
-            valid = false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }*/
+	public void setTextResourceService( TextResourceService textResourceService )
+	{
+		this.textResourceService = textResourceService;
+	}
 
-/*        // Validation Step G (Prüfsummen-Validierung)
-        try {
-            if (this.getValidationGchecksumModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_G)));
-                this.getValidationGchecksumModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_G))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_G));
-                this.getValidationGchecksumModule().getMessageService().print();
-                valid = false;
-            }
-        } catch (ValidationGchecksumException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_G), e.getMessage()));
-            this.getValidationGchecksumModule().getMessageService().print();
-            valid = false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }*/
+	public boolean executeMandatory( File siardDatei )
+	{
+		boolean valid = true;
 
+		// Validation Step A (Lesbarkeit)
+		try {
+			if ( this.getValidationAzipModule().validate( siardDatei ) ) {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_VALID,
+						getTextResourceService().getText( MESSAGE_MODULE_A ) ) );
+				this.getValidationAzipModule().getMessageService().print();
+			} else {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_INVALID,
+						getTextResourceService().getText( MESSAGE_MODULE_A ) )
+						+ getTextResourceService().getText(
+								MESSAGE_STEPERGEBNIS_A ) );
+				// Ein negatives Validierungsresultat in diesem Schritt führt
+				// zum Abbruch der weiteren Verarbeitung
+				this.getValidationAzipModule().getMessageService().print();
+				return false;
+			}
+		} catch ( ValidationAzipException e ) {
+			LOGGER.logInfo( getTextResourceService().getText(
+					MESSAGE_MODULE_INVALID_2ARGS,
+					getTextResourceService().getText( MESSAGE_MODULE_A ),
+					e.getMessage() ) );
+			this.getValidationAzipModule().getMessageService().print();
+			return false;
+		} catch ( Exception e ) {
+			LOGGER.logInfo( getTextResourceService().getText( ERROR_UNKNOWN ) );
+			LOGGER.logError( e.getMessage() );
+			return false;
+		}
 
-        // Validation Step H (Content-Validierung)
-        try {
-            if (this.getValidationHcontentModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_H)));
-                this.getValidationHcontentModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_H))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_H));
-                this.getValidationHcontentModule().getMessageService().print();
-                valid = false;
-            }
-        } catch (ValidationHcontentException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_H), e.getMessage()));
-            this.getValidationHcontentModule().getMessageService().print();
-            valid = false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }
+		// Validation Step B (primäre Verzeichnisstruktur)
+		try {
+			if ( this.getValidationBprimaryStructureModule().validate(
+					siardDatei ) ) {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_VALID,
+						getTextResourceService().getText( MESSAGE_MODULE_B ) ) );
+				this.getValidationBprimaryStructureModule().getMessageService()
+						.print();
+			} else {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_INVALID,
+						getTextResourceService().getText( MESSAGE_MODULE_B ) )
+						+ getTextResourceService().getText(
+								MESSAGE_STEPERGEBNIS_B ) );
+				// Ein negatives Validierungsresultat in diesem Schritt führt
+				// zum Abbruch der weiteren Verarbeitung
+				this.getValidationBprimaryStructureModule().getMessageService()
+						.print();
+				return false;
+			}
+		} catch ( ValidationBprimaryStructureException e ) {
+			LOGGER.logInfo( getTextResourceService().getText(
+					MESSAGE_MODULE_INVALID_2ARGS,
+					getTextResourceService().getText( MESSAGE_MODULE_B ),
+					e.getMessage() ) );
+			this.getValidationBprimaryStructureModule().getMessageService()
+					.print();
+			return false;
+		} catch ( Exception e ) {
+			LOGGER.logInfo( getTextResourceService().getText( ERROR_UNKNOWN ) );
+			LOGGER.logError( e.getMessage() );
+			return false;
+		}
 
+		// Validation Step C (Header-Validierung)
+		try {
+			if ( this.getValidationCheaderModule().validate( siardDatei ) ) {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_VALID,
+						getTextResourceService().getText( MESSAGE_MODULE_C ) ) );
+				this.getValidationCheaderModule().getMessageService().print();
+			} else {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_INVALID,
+						getTextResourceService().getText( MESSAGE_MODULE_C ) )
+						+ getTextResourceService().getText(
+								MESSAGE_STEPERGEBNIS_C ) );
+				this.getValidationCheaderModule().getMessageService().print();
+				// Ein negatives Validierungsresultat in diesem Schritt führt
+				// zum Abbruch der weiteren Verarbeitung
+				return false;
+			}
+		} catch ( ValidationCheaderException e ) {
+			LOGGER.logInfo( getTextResourceService().getText(
+					MESSAGE_MODULE_INVALID_2ARGS,
+					getTextResourceService().getText( MESSAGE_MODULE_C ),
+					e.getMessage() ) );
+			this.getValidationCheaderModule().getMessageService().print();
+			return false;
+		} catch ( Exception e ) {
+			LOGGER.logInfo( getTextResourceService().getText( ERROR_UNKNOWN ) );
+			LOGGER.logError( e.getMessage() );
+			return false;
+		}
 
-        // Validation Step I (SIARD-Erkennung)
-        try {
-            if (this.getValidationIrecognitionModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_I)));
-                this.getValidationIrecognitionModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_I))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_I));
-                this.getValidationIrecognitionModule().getMessageService().print();
-                valid = false;
-            }
-        } catch (ValidationIrecognitionException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_I), e.getMessage()));
-            this.getValidationIrecognitionModule().getMessageService().print();
-            valid = false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }
+		// Validation Step D (Struktur-Validierung)
+		try {
+			if ( this.getValidationDstructureModule().validate( siardDatei ) ) {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_VALID,
+						getTextResourceService().getText( MESSAGE_MODULE_D ) ) );
+				this.getValidationDstructureModule().getMessageService()
+						.print();
+			} else {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_INVALID,
+						getTextResourceService().getText( MESSAGE_MODULE_D ) )
+						+ getTextResourceService().getText(
+								MESSAGE_STEPERGEBNIS_D ) );
+				this.getValidationDstructureModule().getMessageService()
+						.print();
+				// Ein negatives Validierungsresultat in diesem Schritt führt
+				// zum Abbruch der weiteren Verarbeitung
+				return false;
+			}
+		} catch ( ValidationDstructureException e ) {
+			LOGGER.logInfo( getTextResourceService().getText(
+					MESSAGE_MODULE_INVALID_2ARGS,
+					getTextResourceService().getText( MESSAGE_MODULE_D ),
+					e.getMessage() ) );
+			this.getValidationDstructureModule().getMessageService().print();
+			return false;
+		} catch ( Exception e ) {
+			LOGGER.logInfo( getTextResourceService().getText( ERROR_UNKNOWN ) );
+			LOGGER.logError( e.getMessage() );
+			return false;
+		}
 
+		return valid;
+	}
 
-        // Validation Step J (Zusätzliche Primärdateien)
-        try {
-            if (this.getValidationJsurplusFilesModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_J)));
-                this.getValidationJsurplusFilesModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_J))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_J));
-                this.getValidationJsurplusFilesModule().getMessageService().print();
-                valid = false;
-            }
-        } catch (ValidationJsurplusFilesException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_J), e.getMessage()));
-            this.getValidationJsurplusFilesModule().getMessageService().print();
-            valid = false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }
+	public boolean executeOptional( File siardDatei )
+	{
+		boolean valid = true;
 
+		/*
+		 * // Validation Step E (Spalten-Validierung) try { if
+		 * (this.getValidationEcolumnModule().validate(siardDatei)) {
+		 * LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
+		 * getTextResourceService().getText(MESSAGE_MODULE_E)));
+		 * this.getValidationEcolumnModule().getMessageService().print(); } else
+		 * {
+		 * LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID
+		 * , getTextResourceService().getText(MESSAGE_MODULE_E)) +
+		 * getTextResourceService().getText(MESSAGE_STEPERGEBNIS_E));
+		 * this.getValidationEcolumnModule().getMessageService().print(); valid
+		 * = false; } } catch (ValidationEcolumnException e) {
+		 * LOGGER.logInfo(getTextResourceService
+		 * ().getText(MESSAGE_MODULE_INVALID_2ARGS,
+		 * getTextResourceService().getText(MESSAGE_MODULE_E), e.getMessage()));
+		 * this.getValidationEcolumnModule().getMessageService().print(); valid
+		 * = false; } catch (Exception e) {
+		 * LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
+		 * LOGGER.logError(e.getMessage()); return false; }
+		 */
 
-/*        // Validation Step K (Constraint-Validierung)
-        try {
-            if (this.getValidationKconstraintModule().validate(siardDatei)) {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_K)));
-                this.getValidationKconstraintModule().getMessageService().print();
-            } else {
-                LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
-                        getTextResourceService().getText(MESSAGE_MODULE_K))
-                        + getTextResourceService().getText(MESSAGE_STEPERGEBNIS_K));
-                this.getValidationKconstraintModule().getMessageService().print();
-                valid = false;
-            }
-        } catch (ValidationKconstraintException e) {
-            LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
-                    getTextResourceService().getText(MESSAGE_MODULE_K), e.getMessage()));
-            this.getValidationKconstraintModule().getMessageService().print();
-            valid = false;
-        } catch (Exception e) {          
-            LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
-            LOGGER.logError(e.getMessage());
-            return false;
-        }*/
+		/*
+		 * // Validation Step F (Zeilen-Validierung) try { if
+		 * (this.getValidationFrowModule().validate(siardDatei)) {
+		 * LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
+		 * getTextResourceService().getText(MESSAGE_MODULE_F)));
+		 * this.getValidationFrowModule().getMessageService().print(); } else {
+		 * LOGGER
+		 * .logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID,
+		 * getTextResourceService().getText(MESSAGE_MODULE_F)) +
+		 * getTextResourceService().getText(MESSAGE_STEPERGEBNIS_F));
+		 * this.getValidationGrowModule().getMessageService().print(); valid =
+		 * false; } } catch (ValidationFrowException e) {
+		 * LOGGER.logInfo(getTextResourceService
+		 * ().getText(MESSAGE_MODULE_INVALID_2ARGS,
+		 * getTextResourceService().getText(MESSAGE_MODULE_F), e.getMessage()));
+		 * this.getValidationFrowModule().getMessageService().print(); valid =
+		 * false; } catch (Exception e) {
+		 * LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
+		 * LOGGER.logError(e.getMessage()); return false; }
+		 */
 
-        return valid;
-    }
+		/*
+		 * // Validation Step G (Prüfsummen-Validierung) try { if
+		 * (this.getValidationGchecksumModule().validate(siardDatei)) {
+		 * LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
+		 * getTextResourceService().getText(MESSAGE_MODULE_G)));
+		 * this.getValidationGchecksumModule().getMessageService().print(); }
+		 * else {
+		 * LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID
+		 * , getTextResourceService().getText(MESSAGE_MODULE_G)) +
+		 * getTextResourceService().getText(MESSAGE_STEPERGEBNIS_G));
+		 * this.getValidationGchecksumModule().getMessageService().print();
+		 * valid = false; } } catch (ValidationGchecksumException e) {
+		 * LOGGER.logInfo
+		 * (getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
+		 * getTextResourceService().getText(MESSAGE_MODULE_G), e.getMessage()));
+		 * this.getValidationGchecksumModule().getMessageService().print();
+		 * valid = false; } catch (Exception e) {
+		 * LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
+		 * LOGGER.logError(e.getMessage()); return false; }
+		 */
+
+		// Validation Step H (Content-Validierung)
+		try {
+			if ( this.getValidationHcontentModule().validate( siardDatei ) ) {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_VALID,
+						getTextResourceService().getText( MESSAGE_MODULE_H ) ) );
+				this.getValidationHcontentModule().getMessageService().print();
+			} else {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_INVALID,
+						getTextResourceService().getText( MESSAGE_MODULE_H ) )
+						+ getTextResourceService().getText(
+								MESSAGE_STEPERGEBNIS_H ) );
+				this.getValidationHcontentModule().getMessageService().print();
+				valid = false;
+			}
+		} catch ( ValidationHcontentException e ) {
+			LOGGER.logInfo( getTextResourceService().getText(
+					MESSAGE_MODULE_INVALID_2ARGS,
+					getTextResourceService().getText( MESSAGE_MODULE_H ),
+					e.getMessage() ) );
+			this.getValidationHcontentModule().getMessageService().print();
+			valid = false;
+		} catch ( Exception e ) {
+			LOGGER.logInfo( getTextResourceService().getText( ERROR_UNKNOWN ) );
+			LOGGER.logError( e.getMessage() );
+			return false;
+		}
+
+		// Validation Step I (SIARD-Erkennung)
+		try {
+			if ( this.getValidationIrecognitionModule().validate( siardDatei ) ) {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_VALID,
+						getTextResourceService().getText( MESSAGE_MODULE_I ) ) );
+				this.getValidationIrecognitionModule().getMessageService()
+						.print();
+			} else {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_INVALID,
+						getTextResourceService().getText( MESSAGE_MODULE_I ) )
+						+ getTextResourceService().getText(
+								MESSAGE_STEPERGEBNIS_I ) );
+				this.getValidationIrecognitionModule().getMessageService()
+						.print();
+				valid = false;
+			}
+		} catch ( ValidationIrecognitionException e ) {
+			LOGGER.logInfo( getTextResourceService().getText(
+					MESSAGE_MODULE_INVALID_2ARGS,
+					getTextResourceService().getText( MESSAGE_MODULE_I ),
+					e.getMessage() ) );
+			this.getValidationIrecognitionModule().getMessageService().print();
+			valid = false;
+		} catch ( Exception e ) {
+			LOGGER.logInfo( getTextResourceService().getText( ERROR_UNKNOWN ) );
+			LOGGER.logError( e.getMessage() );
+			return false;
+		}
+
+		// Validation Step J (Zusätzliche Primärdateien)
+		try {
+			if ( this.getValidationJsurplusFilesModule().validate( siardDatei ) ) {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_VALID,
+						getTextResourceService().getText( MESSAGE_MODULE_J ) ) );
+				this.getValidationJsurplusFilesModule().getMessageService()
+						.print();
+			} else {
+				LOGGER.logInfo( getTextResourceService().getText(
+						MESSAGE_MODULE_INVALID,
+						getTextResourceService().getText( MESSAGE_MODULE_J ) )
+						+ getTextResourceService().getText(
+								MESSAGE_STEPERGEBNIS_J ) );
+				this.getValidationJsurplusFilesModule().getMessageService()
+						.print();
+				valid = false;
+			}
+		} catch ( ValidationJsurplusFilesException e ) {
+			LOGGER.logInfo( getTextResourceService().getText(
+					MESSAGE_MODULE_INVALID_2ARGS,
+					getTextResourceService().getText( MESSAGE_MODULE_J ),
+					e.getMessage() ) );
+			this.getValidationJsurplusFilesModule().getMessageService().print();
+			valid = false;
+		} catch ( Exception e ) {
+			LOGGER.logInfo( getTextResourceService().getText( ERROR_UNKNOWN ) );
+			LOGGER.logError( e.getMessage() );
+			return false;
+		}
+
+		/*
+		 * // Validation Step K (Constraint-Validierung) try { if
+		 * (this.getValidationKconstraintModule().validate(siardDatei)) {
+		 * LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_VALID,
+		 * getTextResourceService().getText(MESSAGE_MODULE_K)));
+		 * this.getValidationKconstraintModule().getMessageService().print(); }
+		 * else {
+		 * LOGGER.logInfo(getTextResourceService().getText(MESSAGE_MODULE_INVALID
+		 * , getTextResourceService().getText(MESSAGE_MODULE_K)) +
+		 * getTextResourceService().getText(MESSAGE_STEPERGEBNIS_K));
+		 * this.getValidationKconstraintModule().getMessageService().print();
+		 * valid = false; } } catch (ValidationKconstraintException e) {
+		 * LOGGER.logInfo
+		 * (getTextResourceService().getText(MESSAGE_MODULE_INVALID_2ARGS,
+		 * getTextResourceService().getText(MESSAGE_MODULE_K), e.getMessage()));
+		 * this.getValidationKconstraintModule().getMessageService().print();
+		 * valid = false; } catch (Exception e) {
+		 * LOGGER.logInfo(getTextResourceService().getText(ERROR_UNKNOWN));
+		 * LOGGER.logError(e.getMessage()); return false; }
+		 */
+
+		return valid;
+	}
 }

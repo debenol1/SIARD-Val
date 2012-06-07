@@ -23,15 +23,17 @@ import ch.kostceco.tools.siardval.exception.module.ValidationHcontentException;
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt H (Content-Validierung)
- * Sind die XML-Dateien im content valid zu ihrer Schema-Definition (XSD-Dateien)? 
- * valid --> tableZ.xml	valid zu	tableZ.xsd
+ * Validierungsschritt H (Content-Validierung) Sind die XML-Dateien im content
+ * valid zu ihrer Schema-Definition (XSD-Dateien)? valid --> tableZ.xml valid zu
+ * tableZ.xsd
+ * 
  * @author Ec Christian Eugster
  */
 
-public interface ValidationHcontentModule extends ValidationModule {
+public interface ValidationHcontentModule extends ValidationModule
+{
 
-    
-    public boolean validate(File siardDatei) throws ValidationHcontentException;
-    
+	public boolean validate( File siardDatei )
+			throws ValidationHcontentException;
+
 }

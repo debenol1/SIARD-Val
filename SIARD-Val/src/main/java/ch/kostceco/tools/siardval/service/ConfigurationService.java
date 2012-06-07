@@ -18,20 +18,22 @@ Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
 
 package ch.kostceco.tools.siardval.service;
 
-
 /**
  * SIARDVal -->
  * 
  * Service Interface für die Konfigurationsdatei.
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
-public interface ConfigurationService extends Service {
-	
-     /**
-     * Gibt den Pfad des Arbeitsverzeichnisses zurück.
-     * Dieses Verzeichnis wird z.B. zum Entpacken des .zip-Files verwendet.
-     * @return Pfad des Arbeitsverzeichnisses
-     */
-    String getPathToWorkDir();
-    
+public interface ConfigurationService extends Service
+{
+
+	/**
+	 * Gibt den Pfad des Arbeitsverzeichnisses zurück. Dieses Verzeichnis wird
+	 * z.B. zum Entpacken des .zip-Files verwendet.
+	 * 
+	 * @return Pfad des Arbeitsverzeichnisses
+	 */
+	String getPathToWorkDir();
+
 }

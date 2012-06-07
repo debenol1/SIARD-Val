@@ -21,27 +21,31 @@ package ch.kostceco.tools.siardval.exception;
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public class SystemException extends Exception {
-	
-	//TODO: Eingefügt für DROID-Test per CMD
+public class SystemException extends Exception
+{
 
-    private static final long serialVersionUID = -5675144395744241578L;
+	// TODO: Eingefügt für DROID-Test per CMD
 
-    
-    public SystemException() {
-        super();
-    }
+	private static final long	serialVersionUID	= -5675144395744241578L;
 
-    public SystemException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public SystemException()
+	{
+		super();
+	}
 
-    public SystemException(String message) {
-        super(message);
-    }
+	public SystemException( String message, Throwable cause )
+	{
+		super( message, cause );
+	}
 
-    public SystemException(Throwable cause) {
-        super(cause);
-    }
+	public SystemException( String message )
+	{
+		super( message );
+	}
+
+	public SystemException( Throwable cause )
+	{
+		super( cause );
+	}
 
 }

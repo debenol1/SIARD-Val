@@ -19,19 +19,22 @@ package ch.kostceco.tools.siardval.exception.module;
 
 import ch.kostceco.tools.siardval.exception.SIARDValException;
 
-public class ValidationFrowException extends SIARDValException {
+public class ValidationFrowException extends SIARDValException
+{
 
-    /**
-     * @author ???
-     */
-    private static final long serialVersionUID = 5060094531057249403L; //tbd
+	/**
+	 * @author ???
+	 */
+	private static final long	serialVersionUID	= 5060094531057249403L; // tbd
 
-    public ValidationFrowException() {
-        super();
-    }
+	public ValidationFrowException()
+	{
+		super();
+	}
 
-    public ValidationFrowException(String message) {
-        super(message);
-    }
+	public ValidationFrowException( String message )
+	{
+		super( message );
+	}
 
 }

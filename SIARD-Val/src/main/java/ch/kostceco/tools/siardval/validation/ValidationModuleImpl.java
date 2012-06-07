@@ -24,29 +24,33 @@ import ch.kostceco.tools.siardval.service.TextResourceService;
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public abstract class ValidationModuleImpl {
-    protected final String UNZIPDIRECTORY = "unzipped";
-    protected final String METADATA = "metadata.xml";
-    protected final String XSD_METADATA = "metadata.xsd";
-    
-    private TextResourceService textResourceService;
-    private MessageService messageService;
+public abstract class ValidationModuleImpl
+{
+	protected final String		UNZIPDIRECTORY	= "unzipped";
+	protected final String		METADATA		= "metadata.xml";
+	protected final String		XSD_METADATA	= "metadata.xsd";
 
-    public TextResourceService getTextResourceService() {
-        return textResourceService;
-    }
+	private TextResourceService	textResourceService;
+	private MessageService		messageService;
 
-    public void setTextResourceService(TextResourceService textResourceService) {
-        this.textResourceService = textResourceService;
-    }
+	public TextResourceService getTextResourceService()
+	{
+		return textResourceService;
+	}
 
-    public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
-    }
+	public void setTextResourceService( TextResourceService textResourceService )
+	{
+		this.textResourceService = textResourceService;
+	}
 
-    public MessageService getMessageService() {
-        return messageService;
-    }
+	public void setMessageService( MessageService messageService )
+	{
+		this.messageService = messageService;
+	}
 
+	public MessageService getMessageService()
+	{
+		return messageService;
+	}
 
 }

@@ -19,19 +19,22 @@ package ch.kostceco.tools.siardval.exception.module;
 
 import ch.kostceco.tools.siardval.exception.SIARDValException;
 
-public class ValidationIrecognitionException extends SIARDValException {
+public class ValidationIrecognitionException extends SIARDValException
+{
 
-    /**
-     * @author Rc Claire Röthlisberger, KOST-CECO
-     */
-    private static final long serialVersionUID = 5060094531057249403L;
+	/**
+	 * @author Rc Claire Röthlisberger, KOST-CECO
+	 */
+	private static final long	serialVersionUID	= 5060094531057249403L;
 
-    public ValidationIrecognitionException() {
-        super();
-    }
+	public ValidationIrecognitionException()
+	{
+		super();
+	}
 
-    public ValidationIrecognitionException(String message) {
-        super(message);
-    }
+	public ValidationIrecognitionException( String message )
+	{
+		super( message );
+	}
 
 }

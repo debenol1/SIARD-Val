@@ -22,15 +22,17 @@ import ch.kostceco.tools.siardval.exception.module.ValidationGchecksumException;
 import ch.kostceco.tools.siardval.validation.ValidationModule;
 
 /**
- * Validierungsschritt G (Prüfsummen-Validierung)
- * Stimmt die Prüfsumme in (messageDigest) mit jener über den Ordner content überein? 
- * valid --> Prüfalorithmus = MD5 	oder	Prüfalorithmus = SHA-1
+ * Validierungsschritt G (Prüfsummen-Validierung) Stimmt die Prüfsumme in
+ * (messageDigest) mit jener über den Ordner content überein? valid -->
+ * Prüfalorithmus = MD5 oder Prüfalorithmus = SHA-1
+ * 
  * @author Km Martin Kaiser, KOST-CECO
  */
 
-public interface ValidationGchecksumModule extends ValidationModule {
+public interface ValidationGchecksumModule extends ValidationModule
+{
 
-    
-    public boolean validate(File siardDatei) throws ValidationGchecksumException;
-    
+	public boolean validate( File siardDatei )
+			throws ValidationGchecksumException;
+
 }

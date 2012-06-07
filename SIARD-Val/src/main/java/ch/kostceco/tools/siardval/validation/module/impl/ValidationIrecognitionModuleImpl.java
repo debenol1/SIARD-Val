@@ -25,36 +25,42 @@ import ch.kostceco.tools.siardval.validation.ValidationModuleImpl;
 import ch.kostceco.tools.siardval.validation.module.ValidationIrecognitionModule;
 
 /**
- * Validierungsschritt I (SIARD-Erkennung)
- * Wird die SIARD-Datei als SIARD erkannt? 
- * valid --> Extension = .siard
+ * Validierungsschritt I (SIARD-Erkennung) Wird die SIARD-Datei als SIARD
+ * erkannt? valid --> Extension = .siard
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
 
-public class ValidationIrecognitionModuleImpl extends ValidationModuleImpl implements ValidationIrecognitionModule {
+public class ValidationIrecognitionModuleImpl extends ValidationModuleImpl
+		implements ValidationIrecognitionModule
+{
 
-    @Override
-    public boolean validate(File siardDatei) throws ValidationIrecognitionException {
-    	
+	@Override
+	public boolean validate( File siardDatei )
+			throws ValidationIrecognitionException
+	{
 
-    	/**
-    	 * Validierung ob die Extension .siard lautet
-    	 */
-        if (! siardDatei.getAbsolutePath().toLowerCase().endsWith(".siard")){
-        	getMessageService().logError(
-                    getTextResourceService().getText(MESSAGE_MODULE_I) + 
-                    getTextResourceService().getText(MESSAGE_DASHES) + 
-                    getTextResourceService().getText(MESSAGE_MODULE_I_NOTALLOWEDEXT));
-            // Die SIARD-Datei wurde nicht als solche erkannt, weil sie keine .siard Extension hat.
-            return false;
-        } 
+		/**
+		 * Validierung ob die Extension .siard lautet
+		 */
+		if ( !siardDatei.getAbsolutePath().toLowerCase().endsWith( ".siard" ) ) {
+			getMessageService().logError(
+					getTextResourceService().getText( MESSAGE_MODULE_I )
+							+ getTextResourceService().getText( MESSAGE_DASHES )
+							+ getTextResourceService().getText(
+									MESSAGE_MODULE_I_NOTALLOWEDEXT ) );
+			// Die SIARD-Datei wurde nicht als solche erkannt, weil sie keine
+			// .siard Extension hat.
+			return false;
+		}
 
-        /**
-         * Validierung ob die PUID richtig erkannt wird (z.B mit DROID)
-         * => Auf diese Validierung kann verzichtet werden, da bereits vorgängig geprüft wurde ob es ein unkomprimiertes
-         * ZIP mit dem entsprechenden metadata.xml ist. 
-         */            
+		/**
+		 * Validierung ob die PUID richtig erkannt wird (z.B mit DROID) => Auf
+		 * diese Validierung kann verzichtet werden, da bereits vorgängig
+		 * geprüft wurde ob es ein unkomprimiertes ZIP mit dem entsprechenden
+		 * metadata.xml ist.
+		 */
 
-       return true;
-    }
+		return true;
+	}
 }
