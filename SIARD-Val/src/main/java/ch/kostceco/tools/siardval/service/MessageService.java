@@ -1,7 +1,8 @@
-/*== SIARD-Val ==================================================================================
+/*== SIARD-Val ===================================================================================
 The SIARD-Val application is used for validate SIARD-Files. 
-Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), XYZ (xyz)
------------------------------------------------------------------------------------------------
+Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), Christian Eugster,
+Olivier Debenath
+--------------------------------------------------------------------------------------------------
 SIARD-Val is a development of the KOST-CECO. All rights rest with the KOST-CECO. 
 This application is free software: you can redistribute it and/or modify it under the 
 terms of the GNU General Public License as published by the Free Software Foundation, 
@@ -12,28 +13,35 @@ See the follow GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; 
 if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
-==============================================================================================*/
+==================================================================================================*/
 
 package ch.kostceco.tools.siardval.service;
 
-
 /**
  * Interface für den Message Stack Service.
+ * 
  * @author Rc Claire Röthlisberger, KOST-CECO
  */
-public interface MessageService extends Service {
-    
-    final static String ERROR = "0";
-    final static String FATAL = "1";
-    final static String INFO = "2";
-    final static String WARN = "3";
-    final static String DEBUG = "4";
+public interface MessageService extends Service
+{
 
-    void logInfo(String message);
-    void logDebug(String message);
-    void logWarning(String message);
-    void logError(String message);
-    void logFatal(String message);
-    void clear();
-    void print();
+	final static String	ERROR	= "0";
+	final static String	FATAL	= "1";
+	final static String	INFO	= "2";
+	final static String	WARN	= "3";
+	final static String	DEBUG	= "4";
+
+	void logInfo( String message );
+
+	void logDebug( String message );
+
+	void logWarning( String message );
+
+	void logError( String message );
+
+	void logFatal( String message );
+
+	void clear();
+
+	void print();
 }

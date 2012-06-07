@@ -1,7 +1,8 @@
-/*== SIARD-Val ==================================================================================
+/*== SIARD-Val ===================================================================================
 The SIARD-Val application is used for validate SIARD-Files. 
-Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), XYZ (xyz)
------------------------------------------------------------------------------------------------
+Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), Christian Eugster,
+Olivier Debenath
+--------------------------------------------------------------------------------------------------
 SIARD-Val is a development of the KOST-CECO. All rights rest with the KOST-CECO. 
 This application is free software: you can redistribute it and/or modify it under the 
 terms of the GNU General Public License as published by the Free Software Foundation, 
@@ -12,7 +13,7 @@ See the follow GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; 
 if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
-==============================================================================================*/
+==================================================================================================*/
 
 package ch.kostceco.tools.siardval.logging;
 
@@ -22,19 +23,23 @@ import org.apache.log4j.spi.LoggingEvent;
 /**
  * logging -->
  * 
- * Erzeugt ein vollkommen "nacktes" Layout, welches nichts als die eigentliche Message enthält.
- * @author Rc Claire Röthlisberger, KOST-CECO 
+ * Erzeugt ein vollkommen "nacktes" Layout, welches nichts als die eigentliche
+ * Message enthält.
+ * 
+ * @author Rc Claire Röthlisberger, KOST-CECO
  */
-public class MessageOnlyLayout extends SimpleLayout {
+public class MessageOnlyLayout extends SimpleLayout
+{
 
-    StringBuffer sbuf = new StringBuffer(128);
+	StringBuffer	sbuf	= new StringBuffer( 128 );
 
-    @Override
-    public String format(LoggingEvent event) {
-        sbuf.setLength(0);
-        sbuf.append(event.getRenderedMessage());
-        sbuf.append(LINE_SEP);
-        return sbuf.toString();
-    }
+	@Override
+	public String format( LoggingEvent event )
+	{
+		sbuf.setLength( 0 );
+		sbuf.append( event.getRenderedMessage() );
+		sbuf.append( LINE_SEP );
+		return sbuf.toString();
+	}
 
 }

@@ -1,7 +1,8 @@
-/*== SIARD-Val ==================================================================================
+/*== SIARD-Val ===================================================================================
 The SIARD-Val application is used for validate SIARD-Files. 
-Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), XYZ (xyz)
------------------------------------------------------------------------------------------------
+Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), Christian Eugster,
+Olivier Debenath
+--------------------------------------------------------------------------------------------------
 SIARD-Val is a development of the KOST-CECO. All rights rest with the KOST-CECO. 
 This application is free software: you can redistribute it and/or modify it under the 
 terms of the GNU General Public License as published by the Free Software Foundation, 
@@ -12,7 +13,7 @@ See the follow GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; 
 if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
-==============================================================================================*/
+==================================================================================================*/
 
 package ch.kostceco.tools.siardval.service.impl;
 
@@ -23,70 +24,77 @@ import java.util.List;
 import ch.kostceco.tools.siardval.logging.Logger;
 import ch.kostceco.tools.siardval.service.MessageService;
 
-public class MessageServiceImpl implements MessageService {
-    /**
-     * @author Rc Claire Röthlisberger, KOST-CECO
-     */
-    
-    private static final Logger LOGGER = new Logger(MessageServiceImpl.class);
+public class MessageServiceImpl implements MessageService
+{
+	/**
+	 * @author Rc Claire Röthlisberger, KOST-CECO
+	 */
 
-    
-    List<String[]> stack = new LinkedList<String[]>();
-    
-    @Override
-    public void logDebug(String message) {
-        this.stack.add(new String[]{MessageService.DEBUG, message});
-    }
+	private static final Logger	LOGGER	= new Logger( MessageServiceImpl.class );
 
-    @Override
-    public void logError(String message) {
-        this.stack.add(new String[]{MessageService.ERROR, message});
-    }
+	List<String[]>				stack	= new LinkedList<String[]>();
 
-    @Override
-    public void logFatal(String message) {
-        this.stack.add(new String[]{MessageService.FATAL, message});
-    }
+	@Override
+	public void logDebug( String message )
+	{
+		this.stack.add( new String[] { MessageService.DEBUG, message } );
+	}
 
-    @Override
-    public void logInfo(String message) {
-        this.stack.add(new String[]{MessageService.INFO, message});
-    }
+	@Override
+	public void logError( String message )
+	{
+		this.stack.add( new String[] { MessageService.ERROR, message } );
+	}
 
-    @Override
-    public void logWarning(String message) {
-        this.stack.add(new String[]{MessageService.WARN, message});
-    }
+	@Override
+	public void logFatal( String message )
+	{
+		this.stack.add( new String[] { MessageService.FATAL, message } );
+	}
 
-    @Override
-    public void clear() {
-        this.stack.removeAll(stack);
-    }
+	@Override
+	public void logInfo( String message )
+	{
+		this.stack.add( new String[] { MessageService.INFO, message } );
+	}
 
-    @Override
-    public void print() {
-        Iterator<String[]> it = this.stack.iterator();
-        while (it.hasNext()) {
-            String[] message = (String[]) it.next();
-            if (message[0].equals(MessageService.DEBUG)) {
-                LOGGER.logDebug(message[1]);
-            }
-            if (message[0].equals(MessageService.ERROR)) {
-                LOGGER.logError(message[1]);
-            }
-            if (message[0].equals(MessageService.FATAL)) {
-                LOGGER.logFatal(message[1]);
-            }
-            if (message[0].equals(MessageService.INFO)) {
-                LOGGER.logInfo(message[1]);
-            }
-            if (message[0].equals(MessageService.WARN)) {
-                LOGGER.logWarning(message[1]);
-            }
-        }
-        
-        this.clear();
-    
-    }
-   
+	@Override
+	public void logWarning( String message )
+	{
+		this.stack.add( new String[] { MessageService.WARN, message } );
+	}
+
+	@Override
+	public void clear()
+	{
+		this.stack.removeAll( stack );
+	}
+
+	@Override
+	public void print()
+	{
+		Iterator<String[]> it = this.stack.iterator();
+		while ( it.hasNext() ) {
+			String[] message = (String[]) it.next();
+			if ( message[0].equals( MessageService.DEBUG ) ) {
+				LOGGER.logDebug( message[1] );
+			}
+			if ( message[0].equals( MessageService.ERROR ) ) {
+				LOGGER.logError( message[1] );
+			}
+			if ( message[0].equals( MessageService.FATAL ) ) {
+				LOGGER.logFatal( message[1] );
+			}
+			if ( message[0].equals( MessageService.INFO ) ) {
+				LOGGER.logInfo( message[1] );
+			}
+			if ( message[0].equals( MessageService.WARN ) ) {
+				LOGGER.logWarning( message[1] );
+			}
+		}
+
+		this.clear();
+
+	}
+
 }
