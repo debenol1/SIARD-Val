@@ -39,27 +39,22 @@ import ch.kostceco.tools.siardval.validation.bean.SiardTable;
 import ch.kostceco.tools.siardval.validation.module.ValidationEcolumnModule;
 
 /**
- * <code>ValidationEcolumnModule</code> provides a means to produce concatenated
- * messages in a language-neutral way. Use this to construct messages
- * displayed for end users.
+ * The module <code>ValidationEcolumnModule</code> validates the columns 
+ * specified in the file <code>metadata.xml</code> against the according
+ * XML schema files.
  *
  * <p>
- * <code>MessageFormat</code> takes a set of objects, formats them, then
- * inserts the formatted strings into the pattern at the appropriate places.
- *
- * <p>
- * <strong>Note:</strong>
- * <code>MessageFormat</code> differs from the other <code>Format</code>
- * classes in that you create a <code>MessageFormat</code> object with one
- * of its constructors (not with a <code>getInstance</code> style factory
- * method). The factory methods aren't necessary because <code>MessageFormat</code>
- * itself doesn't implement locale specific behavior. Any locale specific
- * behavior is defined by the pattern that you provide as well as the
- * subformats used for inserted arguments.
- *
- * <h4><a name="patterns">Patterns and Their Interpretation</a></h4>
- *
- * <code>MessageFormat</code> uses patterns of the following form:
+ * The column validation process consists of four steps. a) The validation
+ * of the attribute count, b) the validation of the attribute's occurrence
+ * - which conforms to the nullable attribute of the table definition - 
+ * c) the validation of the attribute's type and d) the validation of the
+ * attribute's sequence. The table columns are only valid if - and only if -
+ * the four validation steps are completed successfully.
+ * 
+ * The table and their columns are described in the file <code>metadata.xml</code>
+ * The element <code> &lt;table&gt</code> and its children are decisive for the
+ * table description:
+ * 
  * <blockquote><pre>
  * <i>MessageFormatPattern:</i>
  *         <i>String</i>
@@ -360,14 +355,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*Logging information*/
 	private StringBuilder validationLog;
 	
-	/* [E] */
-	 /**
-     * Entry point of the column validation. The <code>validate</code> 
-     * method first initializes the validation context. Therefore the
-     * method <code>prepareValidation</code> is executed prior to the
-     * actual validation. The column validation itself is divided into
-     * the validation of the attribute count, the validation of the
-     * attribute occurrence, the validation of the attribute types and
+	/**
+    * Entry point of the column validation. The <code>validate</code> 
+    * method first initializes the validation context. Therefore the
+    * method <code>prepareValidation</code> is executed prior to the
+    * actual validation. The column validation itself is divided into
+    * the validation of the attribute count, the validation of the
+    * attribute occurrence, the validation of the attribute types and
      * the validation of the attribute's sequence
      * <a href="#patterns">class description</a>.
      *
