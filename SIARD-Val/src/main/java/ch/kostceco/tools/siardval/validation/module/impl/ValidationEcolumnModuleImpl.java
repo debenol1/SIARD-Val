@@ -178,7 +178,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE));
 			 } 
-			 /*
 			 //Validates the type of table attributes in metadata.xml
 			 if (validateAttributeType(siardTables, properties) == false) {
 				valid = false;
@@ -189,7 +188,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			 } else if (this.isVerboseMode()) {
 				 	getMessageService().logInfo(this.getValidationLog().toString());
 			 }	
-			 
+			 /*
 	         //Validates the sequence of table attributes in metadata.xml
 			 if (validateAttributeSequence(properties) == false) {
 				valid = false;
@@ -445,11 +444,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/* [E.3] */
 	private boolean validateAttributeType(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
+		boolean validType = false;
 		boolean valid = true;
 		final String ME = "[E.3] validateAttributeType(List<SiardTable> siardTables, " +
-				"Properties properties)";
+				"Properties properties) ";
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
+		String message = new String();
 		String methodTitle = properties.
 				getProperty("attribute.type.validator");
 		String methodDescription = properties.
@@ -489,12 +490,20 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					String trimmedExpectedType = trimLeftSideType(leftSide, delimiter);
 					//Designing expected column type in table.xsd, called "rightSide"
 					String expectedType = properties.getProperty(trimmedExpectedType);
+					//In case the expected type does not exist
+					if (expectedType == null) {
+						expectedType = properties.getProperty("atribute.type.validator.unknown.type");
+						validType = false;
+						valid = false;
+					}
 					//Convey the column types for the all over sequence test [E.4] 
 					xmlElementSequence.add(expectedType);
 					xsdElementSequence.add(rightSide);
 					//Verify, whether the column type in XML is equal to the one in XSD
 					if (expectedType.equalsIgnoreCase(rightSide)) {
+						validType = true;
 					} else {
+						validType = false;
 						valid = false;
 					}
 					//Add column info to the log entry
@@ -510,30 +519,44 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 								   expectedType,
 								   siardTable.getTableName(),
 								   rightSide,
-								   valid);
+								   validType);
 					validationLog.append(validationLogColumnEntry);
 					validationLog.append(properties.getProperty("newline"));
 				}
+			//If the numbers of columns differs between metadata.xml and according XML schema
 			} else {
 				valid = false;
+				String errorMessage = properties.getProperty("attribute.type.error.wrong.count");
+				String validationStatus = properties.getProperty("attribute.type.error.invalid");
+				//Validation fails if allover number differs in metadata.xml and XML schemata
+				validationLog.append(errorMessage);
+				validationLog.append(validationStatus);
+				validationLog.append(valid);
+				validationLog.append('\n');
 			}
 		}
 		//Save the allover column elements for [E.4]
 		this.setXmlElementsSequence(xmlElementSequence);
 		this.setXsdElementsSequence(xsdElementSequence);
 		//Writes back validatable XML elements
-		if (this.getXmlElementsSequence() != null && this.getXsdElementsSequence() != null) {
+		if (this.getXmlElementsSequence() != null && 
+			this.getXsdElementsSequence() != null && 
+			properties != null &&
+			valid) {
 			//Updating validation log
-			String message = properties.getProperty("successfully.executed");
-			String newLine = properties.getProperty("newline");
-			validationLog.append(newLine);
-			validationLog.append(ME + message);
-			valid = true;
+			message = properties.getProperty("successfully.executed");
+			validType = true;
+		} else {
+			message = properties.getProperty("failed");
+			validType = false;
 		}
+		String newLine = properties.getProperty("newline");
+		validationLog.append(newLine);
+		validationLog.append(ME + message);
 		//Write the local validation log to the validation context
-	    this.setValidationLog(validationLog);
+	    this.getValidationLog().append(validationLog);
 	    //Return the current validation state
-		return valid;
+		return validType;
 	}
 	/* [E.4] */
 	private boolean validateAttributeSequence(Properties properties) 
