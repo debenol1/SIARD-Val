@@ -54,266 +54,24 @@ import ch.kostceco.tools.siardval.validation.module.ValidationEcolumnModule;
  * The table and their columns are described in the file <code>metadata.xml</code>
  * The element <code> &lt;table&gt</code> and its children are decisive for the
  * table description:
- * 
- * <blockquote><pre>
- * <i>MessageFormatPattern:</i>
- *         <i>String</i>
- *         <i>MessageFormatPattern</i> <i>FormatElement</i> <i>String</i>
- *
- * <i>FormatElement:</i>
- *         { <i>ArgumentIndex</i> }
- *         { <i>ArgumentIndex</i> , <i>FormatType</i> }
- *         { <i>ArgumentIndex</i> , <i>FormatType</i> , <i>FormatStyle</i> }
- *
- * <i>FormatType: one of </i>
- *         number date time choice
- *
- * <i>FormatStyle:</i>
- *         short
- *         medium
- *         long
- *         full
- *         integer
- *         currency
- *         percent
- *         <i>SubformatPattern</i>
- * </pre></blockquote>
- *
- * <p>Within a <i>String</i>, a pair of single quotes can be used to
- * quote any arbitrary characters except single quotes. For example,
- * pattern string <code>"'{0}'"</code> represents string
- * <code>"{0}"</code>, not a <i>FormatElement</i>. A single quote itself
- * must be represented by doubled single quotes {@code ''} throughout a
- * <i>String</i>.  For example, pattern string <code>"'{''}'"</code> is
- * interpreted as a sequence of <code>'{</code> (start of quoting and a
- * left curly brace), <code>''</code> (a single quote), and
- * <code>}'</code> (a right curly brace and end of quoting),
- * <em>not</em> <code>'{'</code> and <code>'}'</code> (quoted left and
- * right curly braces): representing string <code>"{'}"</code>,
- * <em>not</em> <code>"{}"</code>.
- *
- * <p>A <i>SubformatPattern</i> is interpreted by its corresponding
- * subformat, and subformat-dependent pattern rules apply. For example,
- * pattern string <code>"{1,number,<u>$'#',##</u>}"</code>
- * (<i>SubformatPattern</i> with underline) will produce a number format
- * with the pound-sign quoted, with a result such as: {@code
- * "$#31,45"}. Refer to each {@code Format} subclass documentation for
- * details.
- *
- * <p>Any unmatched quote is treated as closed at the end of the given
- * pattern. For example, pattern string {@code "'{0}"} is treated as
- * pattern {@code "'{0}'"}.
- *
- * <p>Any curly braces within an unquoted pattern must be balanced. For
- * example, <code>"ab {0} de"</code> and <code>"ab '}' de"</code> are
- * valid patterns, but <code>"ab {0'}' de"</code>, <code>"ab } de"</code>
- * and <code>"''{''"</code> are not.
- *
- * <p>
- * <dl><dt><b>Warning:</b><dd>The rules for using quotes within message
- * format patterns unfortunately have shown to be somewhat confusing.
- * In particular, it isn't always obvious to localizers whether single
- * quotes need to be doubled or not. Make sure to inform localizers about
- * the rules, and tell them (for example, by using comments in resource
- * bundle source files) which strings will be processed by {@code MessageFormat}.
- * Note that localizers may need to use single quotes in translated
- * strings where the original version doesn't have them.
- * </dl>
- * <p>
- * The <i>ArgumentIndex</i> value is a non-negative integer written
- * using the digits {@code '0'} through {@code '9'}, and represents an index into the
- * {@code arguments} array passed to the {@code format} methods
- * or the result array returned by the {@code parse} methods.
- * <p>
- * The <i>FormatType</i> and <i>FormatStyle</i> values are used to create
- * a {@code Format} instance for the format element. The following
- * table shows how the values map to {@code Format} instances. Combinations not
- * shown in the table are illegal. A <i>SubformatPattern</i> must
- * be a valid pattern string for the {@code Format} subclass used.
- * <p>
- * <table border=1 summary="Shows how FormatType and FormatStyle values map to Format instances">
- *    <tr>
- *       <th id="ft" class="TableHeadingColor">FormatType
- *       <th id="fs" class="TableHeadingColor">FormatStyle
- *       <th id="sc" class="TableHeadingColor">Subformat Created
- *    <tr>
- *       <td headers="ft"><i>(none)</i>
- *       <td headers="fs"><i>(none)</i>
- *       <td headers="sc"><code>null</code>
- *    <tr>
- *       <td headers="ft" rowspan=5><code>number</code>
- *       <td headers="fs"><i>(none)</i>
- *       <td headers="sc">{@link NumberFormat#getInstance(Locale) NumberFormat.getInstance}{@code (getLocale())}
- *    <tr>
- *       <td headers="fs"><code>integer</code>
- *       <td headers="sc">{@link NumberFormat#getIntegerInstance(Locale) NumberFormat.getIntegerInstance}{@code (getLocale())}
- *    <tr>
- *       <td headers="fs"><code>currency</code>
- *       <td headers="sc">{@link NumberFormat#getCurrencyInstance(Locale) NumberFormat.getCurrencyInstance}{@code (getLocale())}
- *    <tr>
- *       <td headers="fs"><code>percent</code>
- *       <td headers="sc">{@link NumberFormat#getPercentInstance(Locale) NumberFormat.getPercentInstance}{@code (getLocale())}
- *    <tr>
- *       <td headers="fs"><i>SubformatPattern</i>
- *       <td headers="sc">{@code new} {@link DecimalFormat#DecimalFormat(String,DecimalFormatSymbols) DecimalFormat}{@code (subformatPattern,} {@link DecimalFormatSymbols#getInstance(Locale) DecimalFormatSymbols.getInstance}{@code (getLocale()))}
- *    <tr>
- *       <td headers="ft" rowspan=6><code>date</code>
- *       <td headers="fs"><i>(none)</i>
- *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>short</code>
- *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#SHORT}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>medium</code>
- *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>long</code>
- *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#LONG}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>full</code>
- *       <td headers="sc">{@link DateFormat#getDateInstance(int,Locale) DateFormat.getDateInstance}{@code (}{@link DateFormat#FULL}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><i>SubformatPattern</i>
- *       <td headers="sc">{@code new} {@link SimpleDateFormat#SimpleDateFormat(String,Locale) SimpleDateFormat}{@code (subformatPattern, getLocale())}
- *    <tr>
- *       <td headers="ft" rowspan=6><code>time</code>
- *       <td headers="fs"><i>(none)</i>
- *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>short</code>
- *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#SHORT}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>medium</code>
- *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#DEFAULT}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>long</code>
- *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#LONG}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><code>full</code>
- *       <td headers="sc">{@link DateFormat#getTimeInstance(int,Locale) DateFormat.getTimeInstance}{@code (}{@link DateFormat#FULL}{@code , getLocale())}
- *    <tr>
- *       <td headers="fs"><i>SubformatPattern</i>
- *       <td headers="sc">{@code new} {@link SimpleDateFormat#SimpleDateFormat(String,Locale) SimpleDateFormat}{@code (subformatPattern, getLocale())}
- *    <tr>
- *       <td headers="ft"><code>choice</code>
- *       <td headers="fs"><i>SubformatPattern</i>
- *       <td headers="sc">{@code new} {@link ChoiceFormat#ChoiceFormat(String) ChoiceFormat}{@code (subformatPattern)}
- * </table>
- * <p>
- *
- * <h4>Usage Information</h4>
- *
- * <p>
- * Here are some examples of usage.
- * In real internationalized programs, the message format pattern and other
- * static strings will, of course, be obtained from resource bundles.
- * Other parameters will be dynamically determined at runtime.
- * <p>
- * The first example uses the static method <code>MessageFormat.format</code>,
- * which internally creates a <code>MessageFormat</code> for one-time use:
- * <blockquote><pre>
- * int planet = 7;
- * String event = "a disturbance in the Force";
- *
- * String result = MessageFormat.format(
- *     "At {1,time} on {1,date}, there was {2} on planet {0,number,integer}.",
- *     planet, new Date(), event);
- * </pre></blockquote>
- * The output is:
- * <blockquote><pre>
- * At 12:30 PM on Jul 3, 2053, there was a disturbance in the Force on planet 7.
- * </pre></blockquote>
- *
- * <p>
- * The following example creates a <code>MessageFormat</code> instance that
- * can be used repeatedly:
- * <blockquote><pre>
- * int fileCount = 1273;
- * String diskName = "MyDisk";
- * Object[] testArgs = {new Long(fileCount), diskName};
- *
- * MessageFormat form = new MessageFormat(
- *     "The disk \"{1}\" contains {0} file(s).");
- *
- * System.out.println(form.format(testArgs));
- * </pre></blockquote>
- * The output with different values for <code>fileCount</code>:
- * <blockquote><pre>
- * The disk "MyDisk" contains 0 file(s).
- * The disk "MyDisk" contains 1 file(s).
- * The disk "MyDisk" contains 1,273 file(s).
- * </pre></blockquote>
- *
- * <p>
- * For more sophisticated patterns, you can use a <code>ChoiceFormat</code>
- * to produce correct forms for singular and plural:
- * <blockquote><pre>
- * MessageFormat form = new MessageFormat("The disk \"{1}\" contains {0}.");
- * double[] filelimits = {0,1,2};
- * String[] filepart = {"no files","one file","{0,number} files"};
- * ChoiceFormat fileform = new ChoiceFormat(filelimits, filepart);
- * form.setFormatByArgumentIndex(0, fileform);
- *
- * int fileCount = 1273;
- * String diskName = "MyDisk";
- * Object[] testArgs = {new Long(fileCount), diskName};
- *
- * System.out.println(form.format(testArgs));
- * </pre></blockquote>
- * The output with different values for <code>fileCount</code>:
- * <blockquote><pre>
- * The disk "MyDisk" contains no files.
- * The disk "MyDisk" contains one file.
- * The disk "MyDisk" contains 1,273 files.
- * </pre></blockquote>
- *
- * <p>
- * You can create the <code>ChoiceFormat</code> programmatically, as in the
- * above example, or by using a pattern. See {@link ChoiceFormat}
- * for more information.
- * <blockquote><pre>
- * form.applyPattern(
- *    "There {0,choice,0#are no files|1#is one file|1&lt;are {0,number,integer} files}.");
- * </pre></blockquote>
- *
- * <p>
- * <strong>Note:</strong> As we see above, the string produced
- * by a <code>ChoiceFormat</code> in <code>MessageFormat</code> is treated as special;
- * occurrences of '{' are used to indicate subformats, and cause recursion.
- * If you create both a <code>MessageFormat</code> and <code>ChoiceFormat</code>
- * programmatically (instead of using the string patterns), then be careful not to
- * produce a format that recurses on itself, which will cause an infinite loop.
- * <p>
- * When a single argument is parsed more than once in the string, the last match
- * will be the final result of the parsing.  For example,
- * <blockquote><pre>
- * MessageFormat mf = new MessageFormat("{0,number,#.##}, {0,number,#.#}");
- * Object[] objs = {new Double(3.1415)};
- * String result = mf.format( objs );
- * // result now equals "3.14, 3.1"
- * objs = null;
- * objs = mf.parse(result, new ParsePosition(0));
- * // objs now equals {new Double(3.1)}
- * </pre></blockquote>
- *
- * <p>
- * Likewise, parsing with a {@code MessageFormat} object using patterns containing
- * multiple occurrences of the same argument would return the last match.  For
- * example,
- * <blockquote><pre>
- * MessageFormat mf = new MessageFormat("{0}, {0}, {0}");
- * String forParsing = "x, y, z";
- * Object[] objs = mf.parse(forParsing, new ParsePosition(0));
- * // result now equals {new String("z")}
- * </pre></blockquote>
- *
- * <h4><a name="synchronization">Synchronization</a></h4>
- *
- * <p>
- * Message formats are not synchronized.
- * It is recommended to create separate format instances for each thread.
- * If multiple threads access a format concurrently, it must be synchronized
- * externally.
+ *  <blockquote><pre>
+ * <code>&lt;table&gt</code>
+ * 	<code>&lt;name&gtgv_schaden&lt;/name&gt</code><br>
+ * 		<code>&lt;folder&gtgv_schaden&lt;/folder&gt</code><br>
+ * 		<code>&lt;description&gtgv_schaden&lt;/description&gt</code><br>
+ * 		<code>&lt;columns&gt</code><br>
+ * 			<code>&lt;column&gt</code><br>
+ * 				<code>&lt;name&gtid&lt;/name&gt</code><br>
+ * 				<code>&lt;type&gtid&lt;/type&gt</code><br>
+ * 				<code>&lt;typeOriginal&gtid&lt;/typeOriginal&gt</code><br>
+ * 				<code>&lt;nullable&gt</code><br>
+ * 				<code>&lt;description&gt</code><br>
+ * 			<code>&lt;/column&gt</code><br>
+ * 		<code>&lt;/columns&gt</code><br>
+ * <code>&lt;/table&gt</code><br>
+ * </pre></blockquote
+ *         
+ *             
  *
  * @see          java.util.Locale
  * @see          Format
@@ -385,9 +143,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                     getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                     getTextResourceService().getText(MESSAGE_DASHES) +
 	                     getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT));
-			 } else if (this.isVerboseMode()) {
-				 getMessageService().logInfo(this.getValidationLog().toString());
-			 }
+			 } 
 			 //Get the prepared SIARD tables from the validation context
 			 List<SiardTable> siardTables = this.getSiardTables();
 			 //Get the Java properties from the validation context
@@ -413,9 +169,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT));
-			 } else if (this.isVerboseMode()){
-				 getMessageService().logInfo(this.getValidationLog().toString());
-			 }
+			 } 
 			 //Validates the nullable property in metadata.xml
 			 if (validateAttributeOccurrence(siardTables, properties) == false) {
 				valid = false;
@@ -423,10 +177,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE));
-			 } else if (this.isVerboseMode()) {
-				 getMessageService().logInfo(this.getValidationLog().toString());
-			 }
-			 
+			 } 
+			 /*
 			 //Validates the type of table attributes in metadata.xml
 			 if (validateAttributeType(siardTables, properties) == false) {
 				valid = false;
@@ -447,7 +199,9 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE));
 			 } else if (this.isVerboseMode()) {
 				 getMessageService().logInfo(this.getValidationLog().toString());
-			 }			 
+			 }*/
+			 
+			 
 		} catch (Exception je) {
 			valid = false;
 				getMessageService().logError(
@@ -455,7 +209,10 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	            getTextResourceService().getText(MESSAGE_DASHES) + je.getMessage());
 		} finally {
 			//System.out.println(this.getValidationLog().toString());
-			getMessageService().logInfo(this.getValidationLog().toString());
+			//If the verbose mode flag is set, the validationLog is beeing flushed
+			if (this.isVerboseMode()) {
+				 getMessageService().logInfo(this.getValidationLog().toString());
+			 }
 			return valid;
 		}
 	}
@@ -463,6 +220,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/* [E.0] */
 	private boolean prepareValidation(File siardFile) throws IOException, JDOMException {
 		StringBuilder validationLog = new StringBuilder();
+		validationLog.append('\n');
+		validationLog.append("============================");
+		validationLog.append('\n');
+		validationLog.append("SIARD VAL Module E Trace Log");
+		validationLog.append('\n');
+		validationLog.append("============================");
 		this.setValidationLog(validationLog);
 		//All over preparation flag
 		boolean prepared = true;
@@ -486,6 +249,22 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 				metadataXMLpicked == true && 
 				validationDataPrepared == true) {
 			prepared = true;
+		} else {
+			//Hard coded validationLog messages in case the properties file could not be accessed
+			validationLog.append("The validation E could not be prepared");
+			validationLog.append('\n');
+			validationLog.append("propertiesLoaded: " + propertiesLoaded);
+			validationLog.append('\n');
+			validationLog.append("pathInitialized: " + pathInitialized);
+			validationLog.append('\n');
+			validationLog.append("xmlAccessPrepared: " + xmlAccessPrepared);
+			validationLog.append('\n');
+			validationLog.append("siardArchiveExtracted: " + siardArchiveExtracted);
+			validationLog.append('\n');
+			validationLog.append("metadataXMLpicked: " + metadataXMLpicked);
+			validationLog.append('\n');
+			validationLog.append("validationDataPrepared: " + validationDataPrepared);
+			validationLog.append('\n');
 		}
 		return prepared;
 	}
@@ -493,9 +272,11 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/* [E.1] */
 	private boolean validateAttributeCount(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
-		boolean valid = true;
+		boolean validColumn = false;
+		boolean validTable = true;
 		final String ME = "[E.1] validateAttributeCount(List<SiardTable> siardTables, " +
 				"Properties properties) ";
+		String message = new String();
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
 		String methodTitle = properties.
@@ -509,8 +290,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		for (SiardTable siardTable : siardTables) {
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
+			//Checks whether the columns count is correct
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
-				valid = true;
+				validColumn = true;
+			} else {
+				validColumn = false;
+				validTable = false;
 			}
 			//Preparing validation log entry
 			String validationLogSceleton = properties.
@@ -521,21 +306,24 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 						   metadataXMLColumnsCount,
 						   tableXSDColumnsCount,
 						   siardTable.getTableName(),
-						   valid);
+						   validColumn);
 			validationLog.append(validationLogEntry);
 			validationLog.append(properties.getProperty("newline"));
 		}
-		if (valid = true) {
+		if (validTable) {
 			//Updating validation log
-			String message = properties.getProperty("successfully.executed");
-			String newLine = properties.getProperty("newline");
-			validationLog.append(newLine);
-			validationLog.append(ME + message);
+			message = properties.getProperty("successfully.executed");
+		} else {
+			message = properties.getProperty("failed");
 		}
+		String newLine = properties.getProperty("newline");
+		validationLog.append(newLine);
+		validationLog.append(ME + message);
 		//Write the local validation log to the validation context
-		this.setValidationLog(validationLog);
+		//this.setValidationLog(validationLog);
+		this.getValidationLog().append(validationLog);
 		//Return the current validation state
-		return valid;
+		return validTable;
 	}
 	
 	/* [E.2] */
@@ -548,11 +336,13 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
      */
 	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
+		boolean validOccurrence = false;
 		boolean valid = true;
 		final String ME = "[E.2] validateAttributeOccurrence(List<SiardTable> siardTables, " +
 				"Properties properties) ";
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
+		String message = new String();
 		String methodTitle = properties.
 				getProperty("attribute.occurrence.validator");
 		String methodDescription = properties.
@@ -597,13 +387,14 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					//If the nullable Element is set to true and the minOccurs attribute is null
 					if (nullable.equalsIgnoreCase("true") && minOccurs == null) {
 						//Validation fails becaus the minOccurs attribute must be set to zero
+						validOccurrence = false;
 						valid = false;
 					//If the nullable Element is set to true and the minOccurs attribute is set to zero
 					} else if (nullable.equalsIgnoreCase("true") && minOccurs.equalsIgnoreCase("0")) {
-						//Validation succeded. Statement is leftt empty not to overwrite previous false values
+						validOccurrence = true;
 					//If the nullable Element is set to false and the minOccurs attribute is null
 					} else if (nullable.equalsIgnoreCase("false") && minOccurs == null) {
-						//Validation succeded. Statement is left empty not to overwrite previous false values
+						validOccurrence = true;
 					}
 					//Add column info to the log entry
 					String validationLogColumnSceleton = properties.
@@ -622,26 +413,34 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 								   validationLogColumnMinOccurs,
 								   columnMinOccurs,
 								   siardTable.getTableName(),
-								   valid);
+								   validOccurrence);
 					validationLog.append(validationLogColumnEntry);
 					validationLog.append(properties.getProperty("newline"));
 				} 
 			} else {
-				//Validation fails if allover number differs in metadata.xml and XML schemata
 				valid = false;
+				String errorMessage = properties.getProperty("attribute.occurrence.error.wrong.count");
+				String validationStatus = properties.getProperty("attribute.occurrence.error.invalid");
+				//Validation fails if allover number differs in metadata.xml and XML schemata
+				validationLog.append(errorMessage);
+				validationLog.append(validationStatus);
+				validationLog.append(valid);
+				validationLog.append('\n');
 			}
 		}
-		if (valid = true) {
+		if (valid) {
 			//Updating vlidation log
-			String message = properties.getProperty("successfully.executed");
-			String newLine = properties.getProperty("newline");
-			validationLog.append(newLine);
-			validationLog.append(ME + message);
+			message = properties.getProperty("successfully.executed");
+		} else {
+			message = properties.getProperty("failed");
 		}
+		String newLine = properties.getProperty("newline");
+		validationLog.append(newLine);
+		validationLog.append(ME + message);
 	    //Write the local validation log to the validation context
-	    this.setValidationLog(validationLog);
+	    this.getValidationLog().append(validationLog);
 	    //Return the current validation state
-		return valid;
+		return validOccurrence;
 	}
 	/* [E.3] */
 	private boolean validateAttributeType(List<SiardTable> siardTables, 
@@ -795,27 +594,39 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		String me = "[E.0.1] initializeProperties() ";
 		//Initializing the validation context properties
 		String propertiesName = "/validation.properties";
+		//Initializing validation Logging
+		StringBuilder validationLog = new StringBuilder();
 		//Get the properties file
 		InputStream propertiesInputStream = getClass().getResourceAsStream(propertiesName);
 		Properties properties = new Properties();
 		properties.load(propertiesInputStream);
 		this.setValidationProperties(properties);
+		//Log messages are created inside the if clause to catch missing properties errors
 		if (this.getValidationProperties() != null) {
 			successfullyCommitted = true;
 			//Set header line to validation log
 			String headerLine = properties.getProperty("newline");
-			this.getValidationLog().append(headerLine);
+			validationLog.append(headerLine);
 			String message = properties.getProperty("successfully.executed");
-			this.getValidationLog().append(me + message);
+			validationLog.append(me + message);
+		} else {
+			//Missing properties file => hard coded messages
+			String headerLine = "\n";
+			validationLog.append(headerLine);
+			String message = "has failed";
+			validationLog.append(me + message);
 		}
+		this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	}
 	/* [E.0.2] */
 	private boolean initializePath(Properties properties) {
 		boolean successfullyCommitted = false;
 		String me = "[E.0.2] initializePath(Properties properties) ";
-		StringBuffer headerPath = new StringBuffer();
-		StringBuffer contentPath = new StringBuffer();
+		StringBuilder headerPath = new StringBuilder();
+		StringBuilder contentPath = new StringBuilder();
+		//Initializing validation Logging
+	    StringBuilder validationLog = new StringBuilder();
 		String workDir = this.getConfigurationService().getPathToWorkDir();
 		//Preparing the internal SIARD directory structure
 		headerPath.append(workDir);
@@ -827,12 +638,18 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		//Writing back the directory structure to the validation context
 		this.setHeaderPath(headerPath.toString());
 		this.setContentPath(contentPath.toString());
-		if (this.getHeaderPath() != null && this.getContentPath() != null) {
+		if (this.getHeaderPath() != null && 
+			this.getContentPath() != null &&
+			this.getValidationProperties() != null) {
 			//Updating the validation log
 			String message = properties.getProperty("successfully.executed");
-			this.getValidationLog().append(me + message);
+			validationLog.append(me + message);
 			successfullyCommitted = true;
+		} else {
+			String message = "has failed";
+			validationLog.append(me + message);
 		}
+		this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	} 
 	/* [E.0.5] */
@@ -840,6 +657,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			throws JDOMException, IOException {
 		boolean successfullyCommitted = false;
 		String me = "[E.0.5] prepareXMLAccess(Properties properties, File metadataXML) ";
+		//Initializing validation Logging
+	    StringBuilder validationLog = new StringBuilder();
 		InputStream inputStream = new FileInputStream(metadataXML);
   		SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(inputStream);
@@ -862,12 +681,17 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			 this.getXsdNamespace() != null &&
 			 this.getXmlPrefix() != null &&
 			 this.getXsdPrefix() != null &&
-			 this.getMetadataXMLDocument() != null) {
+			 this.getMetadataXMLDocument() != null && 
+			 this.getValidationProperties() != null) {
 			 //Updating the validation log
 			 String message = properties.getProperty("successfully.executed");
-			 this.getValidationLog().append(me + message);
+			 validationLog.append(me + message);
 			 successfullyCommitted = true;
+		} else {
+			String message = "has failed";
+			validationLog.append(me + message);
 		}
+		this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	}    
 	/* */
@@ -885,6 +709,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			   throws FileNotFoundException, IOException {
     	boolean sucessfullyCommitted = false;
     	String me = "[E.0.3] extractSiardArchive (File packedSiardArchive) ";
+    	//Initializing validation Logging
+	    StringBuilder validationLog = new StringBuilder();
 		//Initializing the access to the SIARD archive
     	Zip64File zipfile = new Zip64File(packedSiardArchive);
 		List<FileEntry> fileEntryList = zipfile.getListFileEntries();
@@ -913,30 +739,43 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			
 		}
 		this.setSiardFiles(extractedSiardFiles);
+		//Checks whether the siard extraction succeeded or not
 		if (this.getSiardFiles() != null) {
 			//Upodating the validation log
 			String message = properties.getProperty("successfully.executed");
-			this.getValidationLog().append(me + message);
+			validationLog.append(me + message);
 			sucessfullyCommitted = true;
+		} else {
+			String message = "has failed";
+			validationLog.append(me + message);
 		}
+		this.getValidationLog().append(validationLog);
 		return sucessfullyCommitted;
 	}
     /* [E.0.4] */
 	private boolean pickMetadataXML (Properties properties) {
 		boolean successfullyCommitted = false;
 		String me = "[E.0.4] pickMetadataXML (Properties properties) ";
+		//Initializing validation Logging
+	    StringBuilder validationLog = new StringBuilder();
 		HashMap<String, File> siardFiles = this.getSiardFiles();
 		String pathToMetadataXML = this.getConfigurationService().getPathToWorkDir();
 		pathToMetadataXML = pathToMetadataXML+properties.getProperty("siard.description");
 		File metadataXML = siardFiles.get(pathToMetadataXML);
 		//Retreave the metadata.xml from the SIARD archive and writes it back to the validation context
 		this.setMetadataXML(metadataXML);
-		if (this.getMetadataXML() != null) {
+		//Checks whether the metadata.xml could be picked up
+		if (this.getMetadataXML() != null &&
+			properties != null) {
 			//Updating the validation log
 			String message = properties.getProperty("successfully.executed");
-			this.getValidationLog().append(me + message);
+			validationLog.append(me + message);
 			successfullyCommitted = true;
+		} else {
+			String message = "has failed";
+			validationLog.append(me + message);
 		}
+		this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	}
 	/* [E.0.6] */
@@ -944,6 +783,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			throws JDOMException, IOException {
 		boolean successfullyCommitted = false;
 		String me = "[E.0.6] prepareValidationData (Properties properties, File metadataXML) ";
+		//Initializing validation Logging
+	    StringBuilder validationLog = new StringBuilder();
 		//Gets the tables to be validated
 		List<SiardTable> siardTables = new ArrayList<SiardTable>();
 		Document document = this.getMetadataXMLDocument();
@@ -1010,12 +851,21 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         		}		
         	}
         }
-        if (this.getSiardTables() != null) {
+        if (this.getSiardTables() != null &&
+        	properties != null &&
+        	metadataXML != null) {
         	//Updating the validation log
         	String message = properties.getProperty("successfully.executed");
-			this.getValidationLog().append(me + message);
+        	String newline = properties.getProperty("newline");
+			validationLog.append(me + message);
+			validationLog.append(newline);
         	successfullyCommitted = true;
+        } else {
+        	String message = "has failed";
+			validationLog.append(me + message);
+			validationLog.append('\n');
         }
+        this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	}
 	//Setter and Getter methods
