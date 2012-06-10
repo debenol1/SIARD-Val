@@ -1,8 +1,7 @@
-/*== SIARD-Val ===================================================================================
+/*== SIARD-Val ==================================================================================
 The SIARD-Val application is used for validate SIARD-Files. 
-Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), Christian Eugster,
-Olivier Debenath
---------------------------------------------------------------------------------------------------
+Copyright (C) 2012 Claire Röthlisberger (KOST-CECO), Martin Kaiser (KOST-CECO), XYZ (xyz)
+-----------------------------------------------------------------------------------------------
 SIARD-Val is a development of the KOST-CECO. All rights rest with the KOST-CECO. 
 This application is free software: you can redistribute it and/or modify it under the 
 terms of the GNU General Public License as published by the Free Software Foundation, 
@@ -13,7 +12,7 @@ See the follow GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; 
 if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
-==================================================================================================*/
+==============================================================================================*/
 
 package ch.kostceco.tools.siardval.validation.module.impl;
 
@@ -96,7 +95,7 @@ public class ValidationJsurplusFilesModuleImpl extends ValidationModuleImpl
 					.append( File.separator ).append( "content" ).toString() );
 			File[] schemas = content.listFiles();
 			for ( File schema : schemas ) {
-				valid = validateSchema( schema, xPath, doc );
+				valid = valid && validateSchema( schema, xPath, doc );
 			}
 		} catch ( java.io.IOException e ) {
 			valid = false;
@@ -173,7 +172,7 @@ public class ValidationJsurplusFilesModuleImpl extends ValidationModuleImpl
 		if ( valid ) {
 			File[] tables = schema.listFiles();
 			for ( File table : tables ) {
-				valid = validateTable( table, xPath, doc );
+				valid = valid && validateTable( table, xPath, doc );
 			}
 		}
 		return valid;
