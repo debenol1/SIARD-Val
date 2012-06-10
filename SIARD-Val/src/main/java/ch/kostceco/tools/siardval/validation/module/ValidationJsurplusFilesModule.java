@@ -27,7 +27,7 @@ import ch.kostceco.tools.siardval.validation.ValidationModule;
  * Dateien oder Ordner die nicht in metadata.xml beschrieben sind ? invalid -->
  * Zusätzliche Ordner oder Dateien im content-Ordner
  * 
- * @author Sp Peter Schneider
+ * @author Ec Christian Eugster
  */
 
 public interface ValidationJsurplusFilesModule extends ValidationModule
