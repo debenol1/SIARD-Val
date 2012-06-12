@@ -22,6 +22,10 @@
 	<bean id="messageService"
 		class="ch.kostceco.tools.siardval.service.impl.MessageServiceImpl">
 	</bean>
+	
+	<bean id="siardTable"
+		class="ch.kostceco.tools.siardval.validation.bean.SiardTable">
+	</bean>
 
 
 	<!-- Validation Services -->
@@ -47,6 +51,7 @@
 		<property name="textResourceService" ref="textResourceService" />
 		<property name="messageService" ref="messageService" />
 		<property name="configurationService" ref="configurationService" />
+		<property name="siardTable" ref="siardTable" />
 	</bean> 
 <!--	<bean id="validationFcolumnModule" class="ch.kostceco.tools.siardval.validation.module.impl.ValidationFcolumnModuleImpl">
 		<property name="textResourceService" ref="textResourceService" />

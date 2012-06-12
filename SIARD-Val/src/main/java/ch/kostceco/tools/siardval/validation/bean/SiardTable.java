@@ -9,6 +9,7 @@ public class SiardTable {
 	private String tableName;
 	private List<Element> metadataXMLElements;
 	private List<Element> tableXSDElements;
+	private List<Element> tableXMLElements;
 	
 	public String getTableName() {
 		return tableName;
@@ -32,6 +33,14 @@ public class SiardTable {
 	
 	public void setTableXSDElements(List<Element> tableXSDElements) {
 		this.tableXSDElements = tableXSDElements;
+	}
+
+	public List<Element> getTableXMLElements() {
+		return tableXMLElements;
+	}
+
+	public void setTableXMLElements(List<Element> tableXMLElements) {
+		this.tableXMLElements = tableXMLElements;
 	}
 	
 }
