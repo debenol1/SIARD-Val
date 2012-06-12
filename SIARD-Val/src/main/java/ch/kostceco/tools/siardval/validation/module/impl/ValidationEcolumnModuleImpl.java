@@ -153,7 +153,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                     getTextResourceService().getText(MESSAGE_MODULE_E_MISSING_SIARD_TABLES));
 			 }
 			 //Validates the number of the attributes
-			 if (validateAttributeCount(siardTables, properties) == false) {
+			 if (validateColumnCount(siardTables, properties) == false) {
 				 valid = false;
 					 getMessageService().logInfo(
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
@@ -161,7 +161,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT));
 			 } 
 			 //Validates the nullable property in metadata.xml
-			 if (validateAttributeOccurrence(siardTables, properties) == false) {
+			 if (validateColumnOccurrence(siardTables, properties) == false) {
 				valid = false;
 					 getMessageService().logInfo(
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
@@ -169,7 +169,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE));
 			 } 
 			 //Validates the type of table attributes in metadata.xml
-			 if (validateAttributeType(siardTables, properties) == false) {
+			 if (validateColumnType(siardTables, properties) == false) {
 				valid = false;
 					 getMessageService().logInfo(
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
@@ -179,7 +179,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 				 	getMessageService().logInfo(this.getValidationLog().toString());
 			 }	
 	         //Validates the sequence of table attributes in metadata.xml
-			 if (validateAttributeSequence(properties) == false) {
+			 if (validateColumnSequence(properties) == false) {
 				valid = false;
 					getMessageService().logInfo(
 	                getTextResourceService().getText(MESSAGE_MODULE_E) +
@@ -262,7 +262,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*[E.1]
 	 *Counts the columns in metadata.xml and compares it to the number of
 	 *columns in the according XML schema files*/
-	private boolean validateAttributeCount(List<SiardTable> siardTables, 
+	private boolean validateColumnCount(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
 		boolean validColumn = false;
 		boolean validTable = true;
@@ -320,7 +320,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*[E.2]
 	 *Compares the <nullable> Element of the metadata.xml to the minOccurs attributes
 	 *in the according XML schemata*/
-	private boolean validateAttributeOccurrence(List<SiardTable> siardTables, 
+	private boolean validateColumnOccurrence(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
 		boolean validOccurrence = false;
 		boolean valid = true;
@@ -431,7 +431,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*[E.3]
 	 *Compares the column types in the metadata.xml to the according
 	 *XML schemata*/
-	private boolean validateAttributeType(List<SiardTable> siardTables, 
+	private boolean validateColumnType(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
 		boolean validType = false;
 		boolean valid = true;
@@ -550,7 +550,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	/*[E.4]
 	 *Compares the sequence of column(types) in the metadata.xml to the
 	 *according XML schemata*/
-	private boolean validateAttributeSequence(Properties properties) 
+	private boolean validateColumnSequence(Properties properties) 
 			throws Exception {
 		boolean validColumn = false;
 		boolean validSequence = true;
