@@ -122,7 +122,8 @@ public class ValidationFrowModuleImpl extends ValidationModuleImpl implements Va
 	@Override
 	public boolean validate(File siardDatei) throws ValidationEcolumnException {
 		 //Validation parameters
-		 this.setVerboseMode(true);
+		 this.setVerboseMode(false);
+		 System.out.println(this.isVerboseMode());
 		 //All over validation flag
 		 boolean valid = true;
 		 try {
@@ -169,7 +170,7 @@ public class ValidationFrowModuleImpl extends ValidationModuleImpl implements Va
 		} finally {
 			//System.out.println(this.getValidationLog().toString());
 			//If the verbose mode flag is set, the validationLog is beeing flushed
-			if (this.isVerboseMode()) {
+			if (this.isVerboseMode()==true) {
 				 getMessageService().logInfo(this.getValidationLog().toString());
 			 }
 			return valid;
