@@ -175,9 +175,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
 	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE));
-			 } else if (this.isVerboseMode()) {
-				 	getMessageService().logInfo(this.getValidationLog().toString());
-			 }	
+			 } 
 	         //Validates the sequence of table attributes in metadata.xml
 			 if (validateColumnSequence(properties) == false) {
 				valid = false;
@@ -985,34 +983,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	}
 
 	/**
-	 * @return the xmlElements
-	 */
-	private List<Element> getXmlElements() {
-		return xmlElements;
-	}
-
-	/**
-	 * @param xmlElements the xmlElements to set
-	 */
-	private void setXmlElements(List<Element> xmlElements) {
-		this.xmlElements = xmlElements;
-	}
-
-	/**
-	 * @return the xsdElements
-	 */
-	private List<Element> getXsdElements() {
-		return xsdElements;
-	}
-
-	/**
-	 * @param xsdElements the xsdElements to set
-	 */
-	private void setXsdElements(List<Element> xsdElements) {
-		this.xsdElements = xsdElements;
-	}
-
-	/**
 	 * @return the xmlElementsSequence
 	 */
 	private List<String> getXmlElementsSequence() {
@@ -1038,20 +1008,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	 */
 	private void setXsdElementsSequence(List<String> xsdElementsSequence) {
 		this.xsdElementsSequence = xsdElementsSequence;
-	}
-
-	/**
-	 * @return the namespaceURI
-	 */
-	private String getNamespaceURI() {
-		return namespaceURI;
-	}
-
-	/**
-	 * @param namespaceURI the namespaceURI to set
-	 */
-	private void setNamespaceURI(String namespaceURI) {
-		this.namespaceURI = namespaceURI;
 	}
 
 	/**
@@ -1166,6 +1122,24 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	}
 	public void setSiardTable(SiardTable siardTable) {
 		this.siardTable = siardTable;
+	}
+	public String getNamespaceURI() {
+		return namespaceURI;
+	}
+	public void setNamespaceURI(String namespaceURI) {
+		this.namespaceURI = namespaceURI;
+	}
+	public List<Element> getXmlElements() {
+		return xmlElements;
+	}
+	public void setXmlElements(List<Element> xmlElements) {
+		this.xmlElements = xmlElements;
+	}
+	public List<Element> getXsdElements() {
+		return xsdElements;
+	}
+	public void setXsdElements(List<Element> xsdElements) {
+		this.xsdElements = xsdElements;
 	}
 }
 
