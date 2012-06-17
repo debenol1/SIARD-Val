@@ -34,6 +34,7 @@ import ch.enterag.utils.zip.FileEntry;
 import ch.enterag.utils.zip.Zip64File;
 import ch.kostceco.tools.siardval.exception.module.ValidationEcolumnException;
 import ch.kostceco.tools.siardval.service.ConfigurationService;
+import ch.kostceco.tools.siardval.service.MessageService;
 import ch.kostceco.tools.siardval.validation.ValidationModuleImpl;
 import ch.kostceco.tools.siardval.validation.bean.SiardTable;
 import ch.kostceco.tools.siardval.validation.module.ValidationEcolumnModule;
@@ -102,6 +103,11 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private Namespace xsdNamespace;
 	/*Logging information*/
 	private StringBuilder validationLog;
+	private StringBuilder incongruentColumnCount;
+	private StringBuilder incongruentColumnOccurrence;
+	private StringBuilder incongruentColumnType;
+	private StringBuilder incongruentColumnSequence;
+	
 	
 	/**
     * Start of the column validation. The <code>validate</code> 
@@ -158,7 +164,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					 getMessageService().logInfo(
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
-	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT));
+	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT, this.getIncongruentColumCount().toString()));
 			 } 
 			 //Validates the nullable property in metadata.xml
 			 if (validateColumnOccurrence(siardTables, properties) == false) {
@@ -166,8 +172,9 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					 getMessageService().logInfo(
 	                 getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                 getTextResourceService().getText(MESSAGE_DASHES) +
-	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE));
+	                 getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE, this.getIncongruentColumnOccurrence()));
 			 } 
+			 /*
 			 //Validates the type of table attributes in metadata.xml
 			 if (validateColumnType(siardTables, properties) == false) {
 				valid = false;
@@ -183,20 +190,15 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	                getTextResourceService().getText(MESSAGE_MODULE_E) +
 	                getTextResourceService().getText(MESSAGE_DASHES) +
 	                getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE));
-			 } 
+			 } */
 		} catch (Exception je) {
 			valid = false;
 				getMessageService().logError(
 				getTextResourceService().getText(MESSAGE_MODULE_E) +
 	            getTextResourceService().getText(MESSAGE_DASHES) + je.getMessage());
-		} finally {
-			//System.out.println(this.getValidationLog().toString());
-			//If the verbose mode flag is set, the validationLog is beeing flushed
-			if (this.isVerboseMode()) {
-				 getMessageService().logInfo(this.getValidationLog().toString());
-			 }
-			return valid;
-		}
+		} 
+		 return valid;
+		
 	}
 	/*[E.0] 
 	 *Prepares the validation process by executing the following steps and stores the results
@@ -262,56 +264,27 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	 *columns in the according XML schema files*/
 	private boolean validateColumnCount(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
-		boolean validColumn = false;
 		boolean validTable = true;
-		final String ME = "[E.1] validateAttributeCount(List<SiardTable> siardTables, " +
-				"Properties properties) ";
-		String message = new String();
+		StringBuilder namesOfInvalidTables = new StringBuilder();
 		//Initializing validation Logging
-		StringBuilder validationLog = new StringBuilder();
-		String methodTitle = properties.
-				getProperty("module.e.attribute.count.validator");
-		String methodDescription = properties.
-				getProperty("module.e.attribute.count.validator.description");
-		validationLog.append(methodTitle);
-		validationLog.append(methodDescription);
-	    //Iteratic over all SIARD tables to count the table attributes
+		//Iteratic over all SIARD tables to count the table attributes
 		//and compare it to the number of registered attributes in the according XML schemas
 		for (SiardTable siardTable : siardTables) {
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
 			//Checks whether the columns count is correct
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
-				validColumn = true;
 			} else {
-				validColumn = false;
 				validTable = false;
+				if (namesOfInvalidTables.length() > 0) {
+					namesOfInvalidTables.append(", ");
+				}
+				namesOfInvalidTables.append(siardTable.getTableName());
+				namesOfInvalidTables.append(properties.getProperty("module.e.siard.table.xsd.file.extension"));
 			}
-			//Preparing validation log entry
-			String validationLogSceleton = properties.
-					getProperty("module.e.attribute.count.validator.log.entry");
-			String validationLogEntry = MessageFormat.
-					format(validationLogSceleton, 
-						   siardTable.getTableName(), 
-						   metadataXMLColumnsCount,
-						   tableXSDColumnsCount,
-						   siardTable.getTableName(),
-						   validColumn);
-			validationLog.append(validationLogEntry);
-			validationLog.append(properties.getProperty("newline"));
 		}
-		if (validTable) {
-			//Updating validation log
-			message = properties.getProperty("successfully.executed");
-		} else {
-			message = properties.getProperty("failed");
-		}
-		String newLine = properties.getProperty("newline");
-		validationLog.append(newLine);
-		validationLog.append(ME + message);
-		//Write the local validation log to the validation context
-		//this.setValidationLog(validationLog);
-		this.getValidationLog().append(validationLog);
+		//Writing back error log
+		this.setIncongruentColumCount(namesOfInvalidTables);
 		//Return the current validation state
 		return validTable;
 	}
@@ -320,28 +293,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	 *in the according XML schemata*/
 	private boolean validateColumnOccurrence(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
-		boolean validOccurrence = false;
-		boolean valid = true;
-		final String ME = "[E.2] validateAttributeOccurrence(List<SiardTable> siardTables, " +
-				"Properties properties) ";
-		//Initializing validation Logging
-		StringBuilder validationLog = new StringBuilder();
-		String message = new String();
-		String methodTitle = properties.
-				getProperty("module.e.attribute.occurrence.validator");
-		String methodDescription = properties.
-				getProperty("module.e.attribute.occurrence.validator.description");
-		validationLog.append(methodTitle);
-		validationLog.append(methodDescription);
+		boolean validOccurrence = true;
+		boolean validTable = true;
+		StringBuilder namesOfInvalidTables = new StringBuilder();
+		StringBuilder namesOfInvalidColumns = new StringBuilder();
 		//Iterate over the SIARD tables and verify the nullable attribute
 		for (SiardTable siardTable : siardTables) {
-			//Add table info to the log entry
-			String validationLogTableSceleton = properties.
-					getProperty("module.e.attribute.occurrence.validator.log.table");
-			String validationLogTableEntry = MessageFormat.
-					format(validationLogTableSceleton, 
-						   siardTable.getTableName());
-			validationLog.append(validationLogTableEntry);
 			//Number of attributes in metadata.xml
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			//Number of attributes in the according XML schemata
@@ -362,6 +319,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 							getProperty("module.e.siard.metadata.xml.nullable.element.name");
 					String minuOccursAttributeDescription = properties.
 							getProperty("module.e.siard.table.xsd.attribute.minOccurs.name");
+					String nameAttributeDescription = properties.
+							getProperty("module.e.siard.table.xsd.attribute.name");
 					//Value of the nullable Element in metadata.xml
 					String nullable = xmlElement.getChild(nullableElementDescription, 
 							xmlNamespace).getValue();
@@ -372,58 +331,37 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					if (nullable.equalsIgnoreCase("true") && minOccurs == null) {
 						//Validation fails becaus the minOccurs attribute must be set to zero
 						validOccurrence = false;
-						valid = false;
-					//If the nullable Element is set to true and the minOccurs attribute is set to zero
+						validTable = false;
+						if (namesOfInvalidColumns.length() > 0) {
+							namesOfInvalidColumns.append(", ");
+						}
+						namesOfInvalidColumns.append(xsdElement.getAttributeValue(nameAttributeDescription));
+						//If the nullable Element is set to true and the minOccurs attribute is set to zero
 					} else if (nullable.equalsIgnoreCase("true") && minOccurs.equalsIgnoreCase("0")) {
-						validOccurrence = true;
+						validTable = true;
 					//If the nullable Element is set to false and the minOccurs attribute is null
 					} else if (nullable.equalsIgnoreCase("false") && minOccurs == null) {
-						validOccurrence = true;
+						validTable = true;
 					}
-					//Add column info to the log entry
-					String validationLogColumnSceleton = properties.
-							getProperty("module.e.attribute.occurrence.validator.log.column");
-					String validationLogColumnName = properties.getProperty("module.e.attribute.occurrence.column.name");
-					String validationLogColumnNullable = properties.getProperty("module.e.attribute.occurrence.nullable");
-					String validationLogColumnMinOccurs = properties.getProperty("module.e.attribute.occurrence.minOccurs");
-					Element columnName = xmlElement.getChild(validationLogColumnName, this.getXmlNamespace());
-					Element columnNullable = xmlElement.getChild(validationLogColumnNullable, this.getXmlNamespace());
-					String columnMinOccurs = xsdElement.getAttributeValue(validationLogColumnMinOccurs);
-					String validationLogColumnEntry = MessageFormat.
-							format(validationLogColumnSceleton, 
-								   columnName.getValue(),
-								   columnNullable.getName(),
-								   columnNullable.getValue(),
-								   validationLogColumnMinOccurs,
-								   columnMinOccurs,
-								   siardTable.getTableName(),
-								   validOccurrence);
-					validationLog.append(validationLogColumnEntry);
-					validationLog.append(properties.getProperty("newline"));
-				} 
+					if (!validTable) {
+						if (namesOfInvalidTables.length() > 0) {
+							namesOfInvalidTables.append(", ");
+						}
+			
+						namesOfInvalidTables.append(siardTable.getTableName());
+						namesOfInvalidTables.append(properties.getProperty("module.e.siard.table.xsd.file.extension"));
+					}
+				}
+				
 			} else {
-				valid = false;
-				String errorMessage = properties.getProperty("module.e.attribute.occurrence.error.wrong.count");
-				String validationStatus = properties.getProperty("module.e.attribute.occurrence.error.invalid");
-				//Validation fails if allover number differs in metadata.xml and XML schemata
-				validationLog.append(errorMessage);
-				validationLog.append(validationStatus);
-				validationLog.append(valid);
-				validationLog.append('\n');
+				validOccurrence = false;
 			}
+			namesOfInvalidTables.append("(");
+			namesOfInvalidTables.append(namesOfInvalidColumns);
+			namesOfInvalidTables.append(")");
 		}
-		if (valid) {
-			//Updating vlidation log
-			message = properties.getProperty("successfully.executed");
-		} else {
-			message = properties.getProperty("failed");
-		}
-		String newLine = properties.getProperty("newline");
-		validationLog.append(newLine);
-		validationLog.append(ME + message);
-	    //Write the local validation log to the validation context
-	    this.getValidationLog().append(validationLog);
-	    //Return the current validation state
+		//Writing back error log
+		this.setIncongruentColumnOccurrence(namesOfInvalidTables);
 		return validOccurrence;
 	}
 	/*[E.3]
@@ -681,12 +619,12 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		boolean successfullyCommitted = false;
 		String me = "[E.0.5] prepareXMLAccess(Properties properties, File metadataXML) ";
 		//Initializing validation Logging
-	    StringBuilder validationLog = new StringBuilder();
+		StringBuilder validationLog = new StringBuilder();
 		InputStream inputStream = new FileInputStream(metadataXML);
   		SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(inputStream);
-        //Assigning JDOM Document to the validation context
-        this.setMetadataXMLDocument(document);
+  		Document document = builder.build(inputStream);
+  		//Assigning JDOM Document to the validation context
+  		this.setMetadataXMLDocument(document);
 		String xmlPrefix = properties.getProperty("module.e.metadata.xml.prefix");
 		String xsdPrefix = properties.getProperty("module.e.table.xsd.prefix");
 		//Setting the namespaces to access metadata.xml and the different table.xsd
@@ -783,7 +721,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		boolean successfullyCommitted = false;
 		String me = "[E.0.4] pickMetadataXML (Properties properties) ";
 		//Initializing validation Logging
-	    StringBuilder validationLog = new StringBuilder();
+		StringBuilder validationLog = new StringBuilder();
 		HashMap<String, File> siardFiles = this.getSiardFiles();
 		String pathToMetadataXML = this.getConfigurationService().getPathToWorkDir();
 		pathToMetadataXML = pathToMetadataXML+properties.getProperty("module.e.siard.description");
@@ -811,17 +749,17 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		boolean successfullyCommitted = false;
 		String me = "[E.0.6] prepareValidationData (Properties properties, File metadataXML) ";
 		//Initializing validation Logging
-	    StringBuilder validationLog = new StringBuilder();
+		StringBuilder validationLog = new StringBuilder();
 		//Gets the tables to be validated
 		List<SiardTable> siardTables = new ArrayList<SiardTable>();
-	    Document document = this.getMetadataXMLDocument();
-        Element rootElement = document.getRootElement();
-        String workingDirectory = this.getConfigurationService().getPathToWorkDir();     
-        String siardSchemasElementsName = properties.getProperty("module.e.siard.metadata.xml.schemas.name");
-        //Gets the list of <schemas> elements from metadata.xml
-        List<Element> siardSchemasElements = rootElement.getChildren(siardSchemasElementsName, 
+		Document document = this.getMetadataXMLDocument();
+		Element rootElement = document.getRootElement();
+		String workingDirectory = this.getConfigurationService().getPathToWorkDir();     
+		String siardSchemasElementsName = properties.getProperty("module.e.siard.metadata.xml.schemas.name");
+		//Gets the list of <schemas> elements from metadata.xml
+		List<Element> siardSchemasElements = rootElement.getChildren(siardSchemasElementsName, 
         		this.getXmlNamespace());
-        for (Element siardSchemasElement : siardSchemasElements) {
+		for (Element siardSchemasElement : siardSchemasElements) {
            	//Gets the list of <schema> elements from metadata.xml
         	List<Element> siardSchemaElements = siardSchemasElement.getChildren(properties.
         			getProperty("module.e.siard.metadata.xml.schema.name"), this.getXmlNamespace());
@@ -841,9 +779,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         					getProperty("module.e.siard.metadata.xml.column.name"), this.getXmlNamespace());
         			String tableName = siardTableElement.getChild(properties.
         					getProperty("module.e.siard.metadata.xml.table.folder.name"), this.getXmlNamespace()).getValue();
-           			//SiardTable siardTable = new SiardTable();
-        			//Decoupling dependency to SiardTable Bean by injecting it via Spring
-        			SiardTable siardTable = this.getSiardTable();
+           			SiardTable siardTable = new SiardTable();
         			siardTable.setMetadataXMLElements(siardColumnElements);
         			siardTable.setTableName(tableName);
         			String siardTableFolderName = siardTableElement.getChild(properties.
@@ -851,17 +787,17 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         			StringBuilder pathToTableSchema = new StringBuilder();
         		    //Preparing access to the according XML schema file
         			pathToTableSchema.append(workingDirectory);
-        		    pathToTableSchema.append(File.separator);
-        		    pathToTableSchema.append(properties.getProperty("module.e.siard.path.to.content"));
-        		    pathToTableSchema.append(File.separator);
-        		    pathToTableSchema.append(schemaFolderName.replaceAll(" ", ""));
-        		    pathToTableSchema.append(File.separator);
-        		    pathToTableSchema.append(siardTableFolderName.replaceAll(" ", ""));
-        		    pathToTableSchema.append(File.separator);
-        		    pathToTableSchema.append(siardTableFolderName.replaceAll(" ", ""));
-        		    pathToTableSchema.append(properties.getProperty("module.e.siard.table.xsd.file.extension"));
-        		    //Retrieve the according XML schema
-        		    File tableSchema = this.getSiardFiles().get(pathToTableSchema.toString());
+        			pathToTableSchema.append(File.separator);
+        		    	pathToTableSchema.append(properties.getProperty("module.e.siard.path.to.content"));
+        		    	pathToTableSchema.append(File.separator);
+        		    	pathToTableSchema.append(schemaFolderName.replaceAll(" ", ""));
+        		    	pathToTableSchema.append(File.separator);
+        		    	pathToTableSchema.append(siardTableFolderName.replaceAll(" ", ""));
+        		    	pathToTableSchema.append(File.separator);
+        		    	pathToTableSchema.append(siardTableFolderName.replaceAll(" ", ""));
+        		    	pathToTableSchema.append(properties.getProperty("module.e.siard.table.xsd.file.extension"));
+        		    	//Retrieve the according XML schema
+        		    	File tableSchema = this.getSiardFiles().get(pathToTableSchema.toString());
            			SAXBuilder builder = new SAXBuilder();
            			Document tableSchemaDocument = builder.build(tableSchema);
            			Element tableSchemaRootElement = tableSchemaDocument.getRootElement();
@@ -875,7 +811,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
         					getProperty("module.e.siard.table.xsd.element"), namespace);
         			siardTable.setTableXSDElements(tableSchemaComplexTypeElements);
         			siardTables.add(siardTable);
-                    //Writing back the List off all SIARD tables to the validation context
+        			//Writing back the List off all SIARD tables to the validation context
            			this.setSiardTables(siardTables);
         		}		
         	}
@@ -1140,6 +1076,32 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	}
 	public void setXsdElements(List<Element> xsdElements) {
 		this.xsdElements = xsdElements;
+	}
+	public StringBuilder getIncongruentColumCount() {
+		return incongruentColumnCount;
+	}
+	public void setIncongruentColumCount(StringBuilder incongruentColumCount) {
+		this.incongruentColumnCount = incongruentColumCount;
+	}
+	public StringBuilder getIncongruentColumnOccurrence() {
+		return incongruentColumnOccurrence;
+	}
+	public void setIncongruentColumnOccurrence(
+			StringBuilder incongruentColumnOccurrence) {
+		this.incongruentColumnOccurrence = incongruentColumnOccurrence;
+	}
+	public StringBuilder getIncongruentColumnType() {
+		return incongruentColumnType;
+	}
+	public void setIncongruentColumnType(StringBuilder incongruentColumnType) {
+		this.incongruentColumnType = incongruentColumnType;
+	}
+	public StringBuilder getIncongruentColumnSequence() {
+		return incongruentColumnSequence;
+	}
+	public void setIncongruentColumnSequence(
+			StringBuilder incongruentColumnSequence) {
+		this.incongruentColumnSequence = incongruentColumnSequence;
 	}
 }
 
