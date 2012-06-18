@@ -291,17 +291,22 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	 *in the according XML schemata*/
 	private boolean validateColumnOccurrence(List<SiardTable> siardTables, 
 			Properties properties) throws Exception {
-		boolean validOccurrence = true;
+		boolean validColumnOccurrence = true;
 		boolean validTable = true;
+		boolean valid = true;
 		StringBuilder namesOfInvalidTables = new StringBuilder();
 		StringBuilder namesOfInvalidColumns = new StringBuilder();
 		//Iterate over the SIARD tables and verify the nullable attribute
 		for (SiardTable siardTable : siardTables) {
+			String nullable = new String();
+			String minOccurs = new String();
+			validTable = true;
 			//Number of attributes in metadata.xml
 			int metadataXMLColumnsCount = siardTable.getMetadataXMLElements().size();
 			//Number of attributes in the according XML schemata
 			int tableXSDColumnsCount = siardTable.getTableXSDElements().size();
-			//Start the validation if the allover number is equal in metadata.xml and XML schemata	 
+			//Start the validation if the allover number is equal in metadata.xml and XML schemata
+			
 			if (metadataXMLColumnsCount == tableXSDColumnsCount) {
 				//Element/Attributes of the actual SIARD table
 				List<Element> xmlElements = siardTable.getMetadataXMLElements();
@@ -309,6 +314,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 				List<Element> xsdElements = siardTable.getTableXSDElements();
 				Namespace xmlNamespace = this.getXmlNamespace();
 				for ( int i = 0; i < metadataXMLColumnsCount; i++) {
+					validColumnOccurrence = true;
 					//Actual Element of the metadata.xml									
 					Element xmlElement = xmlElements.get(i);
 					//Actual Element of the according XML schema
@@ -320,48 +326,77 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					String nameAttributeDescription = properties.
 							getProperty("module.e.siard.table.xsd.attribute.name");
 					//Value of the nullable Element in metadata.xml
-					String nullable = xmlElement.getChild(nullableElementDescription, 
+					nullable = xmlElement.getChild(nullableElementDescription, 
 							xmlNamespace).getValue();
 					//Value of the minOccurs attribute in the according XML schema
-					String minOccurs = xsdElement.
+					minOccurs = xsdElement.
 							getAttributeValue(minuOccursAttributeDescription);
 					//If the nullable Element is set to true and the minOccurs attribute is null
+					
 					if (nullable.equalsIgnoreCase("true") && minOccurs == null) {
 						//Validation fails becaus the minOccurs attribute must be set to zero
-						validOccurrence = false;
+						validColumnOccurrence = false;
 						validTable = false;
+						valid = false;
+						
+						
 						if (namesOfInvalidColumns.length() > 0) {
 							namesOfInvalidColumns.append(", ");
 						}
 						namesOfInvalidColumns.append(xsdElement.getAttributeValue(nameAttributeDescription));
 						//If the nullable Element is set to true and the minOccurs attribute is set to zero
 					} else if (nullable.equalsIgnoreCase("true") && minOccurs.equalsIgnoreCase("0")) {
-						validTable = true;
+						validColumnOccurrence = true;
 					//If the nullable Element is set to false and the minOccurs attribute is null
 					} else if (nullable.equalsIgnoreCase("false") && minOccurs == null) {
-						validTable = true;
+						validColumnOccurrence = true;
+					} else if (nullable.equalsIgnoreCase("false") && minOccurs.equalsIgnoreCase("0")) {
+						validColumnOccurrence = false;
+						validTable = false;
+						valid = false;
+						if (namesOfInvalidColumns.length() > 0) {
+							namesOfInvalidColumns.append(", ");
+						}
+						namesOfInvalidColumns.append(xsdElement.getAttributeValue(nameAttributeDescription));
 					}
-					if (!validTable) {
+					//System.out.println("und hier: "+siardTable.getTableName() +": " + validTable + " columnOccurrence: "+ validColumnOccurrence+ "(nullable: " + nullable+ " minOccurs: " + minOccurs + ")");
+					/*if (!validTable) {
 						if (namesOfInvalidTables.length() > 0) {
 							namesOfInvalidTables.append(", ");
 						}
-			
 						namesOfInvalidTables.append(siardTable.getTableName());
 						namesOfInvalidTables.append(properties.getProperty("module.e.siard.table.xsd.file.extension"));
-					}
+						namesOfInvalidTables.append("(");
+						namesOfInvalidTables.append(namesOfInvalidColumns);
+						namesOfInvalidTables.append(")");
+					}*/
+					
+					
 				}
 				
+			
 			} else {
-				validOccurrence = false;
+				validColumnOccurrence = false;
 			}
+		
+		if (validTable == false) {
+			
+			if (namesOfInvalidTables.length() > 0) {
+				namesOfInvalidTables.append(", ");
+			}
+			namesOfInvalidTables.append(siardTable.getTableName() );
+			namesOfInvalidTables.append("(");
+			namesOfInvalidTables.append(namesOfInvalidColumns);
+			namesOfInvalidTables.append(")");
+			namesOfInvalidColumns = null;
+			namesOfInvalidColumns = new StringBuilder();
 			
 		}
-		namesOfInvalidTables.append("(");
-		namesOfInvalidTables.append(namesOfInvalidColumns);
-		namesOfInvalidTables.append(")");
+		}
+		
 		//Writing back error log
 		this.setIncongruentColumnOccurrence(namesOfInvalidTables);
-		return validOccurrence;
+		return valid;
 	}
 	/*[E.3]
 	 *Compares the column types in the metadata.xml to the according
