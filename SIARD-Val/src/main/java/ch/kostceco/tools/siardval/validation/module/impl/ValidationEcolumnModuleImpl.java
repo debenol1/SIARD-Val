@@ -34,7 +34,6 @@ import ch.enterag.utils.zip.FileEntry;
 import ch.enterag.utils.zip.Zip64File;
 import ch.kostceco.tools.siardval.exception.module.ValidationEcolumnException;
 import ch.kostceco.tools.siardval.service.ConfigurationService;
-import ch.kostceco.tools.siardval.service.MessageService;
 import ch.kostceco.tools.siardval.validation.ValidationModuleImpl;
 import ch.kostceco.tools.siardval.validation.bean.SiardTable;
 import ch.kostceco.tools.siardval.validation.module.ValidationEcolumnModule;
@@ -124,7 +123,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
     * @exception ValidationEcolumnException if the representation of the 
     * columns is invalid
     */
-	@SuppressWarnings("finally")
 	@Override
 	public boolean validate(File siardDatei) throws ValidationEcolumnException {
 		 //Validation parameters
@@ -356,10 +354,11 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			} else {
 				validOccurrence = false;
 			}
-			namesOfInvalidTables.append("(");
-			namesOfInvalidTables.append(namesOfInvalidColumns);
-			namesOfInvalidTables.append(")");
+			
 		}
+		namesOfInvalidTables.append("(");
+		namesOfInvalidTables.append(namesOfInvalidColumns);
+		namesOfInvalidTables.append(")");
 		//Writing back error log
 		this.setIncongruentColumnOccurrence(namesOfInvalidTables);
 		return validOccurrence;
@@ -722,10 +721,14 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		String me = "[E.0.4] pickMetadataXML (Properties properties) ";
 		//Initializing validation Logging
 		StringBuilder validationLog = new StringBuilder();
+		StringBuilder pathToMetadataXML = new StringBuilder();
+		pathToMetadataXML.append(this.getConfigurationService().getPathToWorkDir());
+		pathToMetadataXML.append(File.separator);
+		pathToMetadataXML.append(properties.getProperty("module.e.siard.path.to.header"));
+		pathToMetadataXML.append(File.separator);
+		pathToMetadataXML.append(properties.getProperty("module.e.siard.metadata.xml"));
 		HashMap<String, File> siardFiles = this.getSiardFiles();
-		String pathToMetadataXML = this.getConfigurationService().getPathToWorkDir();
-		pathToMetadataXML = pathToMetadataXML+properties.getProperty("module.e.siard.description");
-		File metadataXML = siardFiles.get(pathToMetadataXML);
+		File metadataXML = siardFiles.get(pathToMetadataXML.toString());
 		//Retreave the metadata.xml from the SIARD archive and writes it back to the validation context
 		this.setMetadataXML(metadataXML);
 		//Checks whether the metadata.xml could be picked up
