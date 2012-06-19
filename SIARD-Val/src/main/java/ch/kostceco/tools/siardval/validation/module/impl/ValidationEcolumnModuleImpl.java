@@ -493,11 +493,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	 *Load the validation properties*/
 	private boolean initializeProperties() throws IOException {
 		boolean successfullyCommitted = false;
-		String me = "[E.0.1] initializeProperties() ";
 		//Initializing the validation context properties
 		String propertiesName = "/validation.properties";
-		//Initializing validation Logging
-		StringBuilder validationLog = new StringBuilder();
 		//Get the properties file
 		InputStream propertiesInputStream = getClass().getResourceAsStream(propertiesName);
 		Properties properties = new Properties();
@@ -506,19 +503,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		//Log messages are created inside the if clause to catch missing properties errors
 		if (this.getValidationProperties() != null) {
 			successfullyCommitted = true;
-			//Set header line to validation log
-			String headerLine = properties.getProperty("newline");
-			validationLog.append(headerLine);
-			String message = properties.getProperty("successfully.executed");
-			validationLog.append(me + message);
-		} else {
-			//Missing properties file => hard coded messages
-			String headerLine = "\n";
-			validationLog.append(headerLine);
-			String message = "has failed";
-			validationLog.append(me + message);
 		}
-		this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	}
 	/*[E.0.2]
@@ -526,11 +511,9 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean initializePath(Properties properties) 
 			throws Exception {
 		boolean successfullyCommitted = false;
-		String me = "[E.0.2] initializePath(Properties properties) ";
 		StringBuilder headerPath = new StringBuilder();
 		StringBuilder contentPath = new StringBuilder();
 		//Initializing validation Logging
-	    StringBuilder validationLog = new StringBuilder();
 		String workDir = this.getConfigurationService().getPathToWorkDir();
 		//Preparing the internal SIARD directory structure
 		headerPath.append(workDir);
@@ -545,15 +528,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 		if (this.getHeaderPath() != null && 
 			this.getContentPath() != null &&
 			this.getValidationProperties() != null) {
-			//Updating the validation log
-			String message = properties.getProperty("successfully.executed");
-			validationLog.append(me + message);
 			successfullyCommitted = true;
-		} else {
-			String message = "has failed";
-			validationLog.append(me + message);
 		}
-		this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	} 
 	/*[E.0.5]
@@ -561,9 +537,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 	private boolean prepareXMLAccess(Properties properties, File metadataXML) 
 			throws JDOMException, IOException {
 		boolean successfullyCommitted = false;
-		String me = "[E.0.5] prepareXMLAccess(Properties properties, File metadataXML) ";
-		//Initializing validation Logging
-		StringBuilder validationLog = new StringBuilder();
 		InputStream inputStream = new FileInputStream(metadataXML);
   		SAXBuilder builder = new SAXBuilder();
   		Document document = builder.build(inputStream);
@@ -588,15 +561,8 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			 this.getXsdPrefix() != null &&
 			 this.getMetadataXMLDocument() != null && 
 			 this.getValidationProperties() != null) {
-			 //Updating the validation log
-			 String message = properties.getProperty("successfully.executed");
-			 validationLog.append(me + message);
 			 successfullyCommitted = true;
-		} else {
-			String message = "has failed";
-			validationLog.append(me + message);
 		}
-		this.getValidationLog().append(validationLog);
 		return successfullyCommitted;
 	}    
 	/*Trimming the search terms for column type validation*/
@@ -614,50 +580,40 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
     private boolean extractSiardArchive (File packedSiardArchive, Properties properties)
 			   throws FileNotFoundException, IOException {
     	boolean sucessfullyCommitted = false;
-    	String me = "[E.0.3] extractSiardArchive (File packedSiardArchive) ";
-    	//Initializing validation Logging
-	    StringBuilder validationLog = new StringBuilder();
-		//Initializing the access to the SIARD archive
+    	//Initializing the access to the SIARD archive
     	Zip64File zipfile = new Zip64File(packedSiardArchive);
-		List<FileEntry> fileEntryList = zipfile.getListFileEntries();
-		String pathToWorkDir = getConfigurationService().getPathToWorkDir();
-		File tmpDir = new File(pathToWorkDir);
-		//Initializing the resulting Hashmap containing all files, indexed by its absolute path
-		HashMap<String, File> extractedSiardFiles = new HashMap<String, File>();
-		//Iterating over the whole SIARD archive
-		for (FileEntry fileEntry : fileEntryList) {
-			if (!fileEntry.isDirectory()) {
-				byte[] buffer = new byte[8192];
-			    EntryInputStream eis = zipfile.openEntryInputStream(fileEntry.getName());
-			    File newFile = new File(tmpDir, fileEntry.getName());
-			    File parent = newFile.getParentFile();
-			    if (!parent.exists()) {
+	List<FileEntry> fileEntryList = zipfile.getListFileEntries();
+	String pathToWorkDir = getConfigurationService().getPathToWorkDir();
+	File tmpDir = new File(pathToWorkDir);
+	//Initializing the resulting Hashmap containing all files, indexed by its absolute path
+	HashMap<String, File> extractedSiardFiles = new HashMap<String, File>();
+	//Iterating over the whole SIARD archive
+	for (FileEntry fileEntry : fileEntryList) {
+		if (!fileEntry.isDirectory()) {
+			byte[] buffer = new byte[8192];
+			EntryInputStream eis = zipfile.openEntryInputStream(fileEntry.getName());
+			File newFile = new File(tmpDir, fileEntry.getName());
+			File parent = newFile.getParentFile();
+			if (!parent.exists()) {
 			    	parent.mkdirs();
-			    }
-			    FileOutputStream fos = new FileOutputStream(newFile);          
-			    for (int iRead = eis.read(buffer); iRead >= 0; iRead = eis.read(buffer)){
-			    	fos.write(buffer, 0, iRead);
-			    }
-			    extractedSiardFiles.put(newFile.getPath(), newFile);
-			    eis.close();
-			    fos.close();
 			}
+			FileOutputStream fos = new FileOutputStream(newFile);          
+			for (int iRead = eis.read(buffer); iRead >= 0; iRead = eis.read(buffer)){
+			    	fos.write(buffer, 0, iRead);
+			}
+			extractedSiardFiles.put(newFile.getPath(), newFile);
+			eis.close();
+			fos.close();
+		}
 			
-		}
-		this.setSiardFiles(extractedSiardFiles);
-		//Checks whether the siard extraction succeeded or not
-		if (this.getSiardFiles() != null) {
-			//Upodating the validation log
-			String message = properties.getProperty("successfully.executed");
-			validationLog.append(me + message);
-			sucessfullyCommitted = true;
-		} else {
-			String message = "has failed";
-			validationLog.append(me + message);
-		}
-		this.getValidationLog().append(validationLog);
-		return sucessfullyCommitted;
 	}
+	this.setSiardFiles(extractedSiardFiles);
+	//Checks whether the siard extraction succeeded or not
+	if (this.getSiardFiles() != null) {
+		sucessfullyCommitted = true;
+	} 
+	return sucessfullyCommitted;
+    }
     /*[E.0.4]
      *Pick up the metadata.xml from the SIARD package*/
 	private boolean pickMetadataXML (Properties properties)
