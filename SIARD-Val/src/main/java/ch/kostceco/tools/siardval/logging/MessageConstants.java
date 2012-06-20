@@ -104,28 +104,29 @@ public interface MessageConstants
 	String	MESSAGE_MODULE_D_MISSING_FILE			= "message.module.d.missing.file";
 	
 	// Modul E Meldungen
-    String MESSAGE_MODULE_E_INVALID_FOLDER               = "message.module.e.invalid.folder";
-    String MESSAGE_MODULE_E_MISSING_FOLDER               = "message.module.e.missing.folder";
-    String MESSAGE_MODULE_E_INVALID_FILE                 = "message.module.e.invalid.file";
-    String MESSAGE_MODULE_E_MISSING_FILE                 = "message.module.e.missing.file";
-    String MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT	 = "message.module.e.invalid.validation.context";
-    String MESSAGE_MODULE_E_MISSING_PROPERTIES			 = "message.module.e.missing.properties";
-    String MESSAGE_MODULE_E_MISSING_SIARD_TABLES		 = "message.module.e.missing.siard.tables";
-    String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT      = "message.module.e.attribute.count.validation.failed";
-    String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE = "message.module.e.attribute.occurrence.validation.failed";
-    String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE   = "message.module.e.attribute.sequence.validation.failed";
-    String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE       = "message.module.e.attribute.type.validation.failed";
+	String MESSAGE_MODULE_E_INVALID_VALIDATION_CONTEXT   = "message.module.e.missing.properties";
+	String MESSAGE_MODULE_E_PROPERTIES_ERROR             = "message.module.e.properties.error";
+	String MESSAGE_MODULE_E_PATH_ERROR		     = "message.module.e.path.error";
+	String MESSAGE_MODULE_E_EXTRACT_ERROR                = "message.module.e.extract.error";
+	String MESSAGE_MODULE_E_METADATA_ACCESS_ERROR        = "message.module.e.metadata.access.error";
+	String MESSAGE_MODULE_E_XML_ACCESS_ERROR	     = "message.module.e.xml.access.error";
+	String MESSAGE_MODULE_E_PREVALIDATION_ERROR          = "message.module.e.prevalidation.error";
+	String MESSAGE_MODULE_E_MISSING_SIARD_TABLES	     = "message.module.e.missing.siard.tables";
+	String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT      = "message.module.e.attribute.count.validation.failed";
+	String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE = "message.module.e.attribute.occurrence.validation.failed";
+	String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE   = "message.module.e.attribute.sequence.validation.failed";
+	String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE       = "message.module.e.attribute.type.validation.failed";
     
-    // Modul F Meldungen
-    String MESSAGE_MODULE_F_INVALID_FOLDER               = "message.module.d.invalid.folder";
-    String MESSAGE_MODULE_F_MISSING_FOLDER               = "message.module.d.missing.folder";
-    String MESSAGE_MODULE_F_INVALID_FILE                 = "message.module.d.invalid.file";
-    String MESSAGE_MODULE_F_MISSING_FILE                 = "message.module.d.missing.file";
-    String MESSAGE_MODULE_F_INVALID_VALIDATION_CONTEXT	 = "message.module.e.invalid.validation.context";
-    String MESSAGE_MODULE_F_MISSING_PROPERTIES			 = "message.module.e.missing.properties";
-    String MESSAGE_MODULE_F_MISSING_SIARD_TABLES		 = "message.module.e.missing.siard.tables";
-    String MESSAGE_MODULE_F_INVALID_ATTRIBUTE_COUNT      = "message.module.e.attribute.count.validation.failed";
-    String MESSAGE_MODULE_F_INVALID_ATTRIBUTE_OCCURRENCE = "message.module.e.attribute.occurrence.validation.failed";
+	// Modul F Meldungen
+	String MESSAGE_MODULE_F_INVALID_FOLDER               = "message.module.d.invalid.folder";
+	String MESSAGE_MODULE_F_MISSING_FOLDER               = "message.module.d.missing.folder";
+	String MESSAGE_MODULE_F_INVALID_FILE                 = "message.module.d.invalid.file";
+	String MESSAGE_MODULE_F_MISSING_FILE                 = "message.module.d.missing.file";
+	String MESSAGE_MODULE_F_INVALID_VALIDATION_CONTEXT	 = "message.module.e.invalid.validation.context";
+	String MESSAGE_MODULE_F_MISSING_PROPERTIES		 = "message.module.e.missing.properties";
+	String MESSAGE_MODULE_F_MISSING_SIARD_TABLES	 = "message.module.e.missing.siard.tables";
+	String MESSAGE_MODULE_F_INVALID_ATTRIBUTE_COUNT      = "message.module.e.attribute.count.validation.failed";
+	String MESSAGE_MODULE_F_INVALID_ATTRIBUTE_OCCURRENCE = "message.module.e.attribute.occurrence.validation.failed";
    
 	// Modul H Meldungen
 	String	MESSAGE_MODULE_H_INVALID_FOLDER			= "message.module.h.invalid.folder";
