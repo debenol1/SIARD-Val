@@ -116,6 +116,7 @@ public interface MessageConstants
 	String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE = "message.module.e.attribute.occurrence.validation.failed";
 	String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE   = "message.module.e.attribute.sequence.validation.failed";
 	String MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE       = "message.module.e.attribute.type.validation.failed";
+	String MESSAGE_MODULE_E_VALIDATION_SKIPPED 	     = "message.module.e.validation.skipped";
     
 	// Modul F Meldungen
 	String MESSAGE_MODULE_F_INVALID_FOLDER               = "message.module.d.invalid.folder";
