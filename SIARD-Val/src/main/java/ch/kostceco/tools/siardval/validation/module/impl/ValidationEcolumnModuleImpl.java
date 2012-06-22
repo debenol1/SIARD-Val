@@ -152,39 +152,38 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 					getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_COUNT, 
 	                		this.getIncongruentColumCount()));
 				 getMessageService().logError(
-							getTextResourceService().getText(MESSAGE_MODULE_E) +
-							getTextResourceService().getText(MESSAGE_DASHES) +
-							getTextResourceService().getText(MESSAGE_MODULE_E_VALIDATION_SKIPPED , 
-			                		this.getIncongruentColumCount()));
+					getTextResourceService().getText(MESSAGE_MODULE_E) +
+					getTextResourceService().getText(MESSAGE_DASHES) +
+					getTextResourceService().getText(MESSAGE_MODULE_E_VALIDATION_SKIPPED , 
+			                this.getIncongruentColumCount()));
 			 } else { 
-			 
-			 //Validates the nullable property in metadata.xml
-			 if (validateColumnOccurrence(siardTables, properties) == false) {
-				valid = false;
-				getMessageService().logError(
-					getTextResourceService().getText(MESSAGE_MODULE_E) +
-					getTextResourceService().getText(MESSAGE_DASHES) +
-					getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE, 
-	                		this.getIncongruentColumnOccurrence()));
-				
-			 } 
-			 //Validates the type of table attributes in metadata.xml
-			 if (validateColumnType(siardTables, properties) == false) {
-				valid = false;
-				getMessageService().logError(
-					getTextResourceService().getText(MESSAGE_MODULE_E) +
-					getTextResourceService().getText(MESSAGE_DASHES) +
-					getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE, 
-	                		this.getIncongruentColumnType()));
-			 } 
-			 //Validates the sequence of table attributes in metadata.xml
-			 if (validateColumnSequence(properties) == false) {
-				valid = false;
-				getMessageService().logError(
-					getTextResourceService().getText(MESSAGE_MODULE_E) +
-					getTextResourceService().getText(MESSAGE_DASHES) +
-					getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE));
-			 }}
+				 //Validates the nullable property in metadata.xml
+				 if (validateColumnOccurrence(siardTables, properties) == false) {
+				 	valid = false;
+					getMessageService().logError(
+						getTextResourceService().getText(MESSAGE_MODULE_E) +
+						getTextResourceService().getText(MESSAGE_DASHES) +
+						getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_OCCURRENCE, 
+						this.getIncongruentColumnOccurrence()));
+			 	} 
+			 	//Validates the type of table attributes in metadata.xml
+			 	if (validateColumnType(siardTables, properties) == false) {
+				 	valid = false;
+					getMessageService().logError(
+						getTextResourceService().getText(MESSAGE_MODULE_E) +
+						getTextResourceService().getText(MESSAGE_DASHES) +
+						getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_TYPE, 
+						this.getIncongruentColumnType()));
+			 	} 
+			 	//Validates the sequence of table attributes in metadata.xml
+			 	if (validateColumnSequence(properties) == false) {
+				 	valid = false;
+					getMessageService().logError(
+						getTextResourceService().getText(MESSAGE_MODULE_E) +
+						getTextResourceService().getText(MESSAGE_DASHES) +
+						getTextResourceService().getText(MESSAGE_MODULE_E_INVALID_ATTRIBUTE_SEQUENCE));
+			 	}
+			 }
 		} catch (Exception je) {
 			valid = false;
 			getMessageService().logError(
@@ -192,7 +191,6 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 			getTextResourceService().getText(MESSAGE_DASHES) + je.getMessage());
 		} 
 		 return valid;
-		
 	}
 	/*[E.0] 
 	 *Prepares the validation process by executing the following steps and stores the results
@@ -354,8 +352,7 @@ public class ValidationEcolumnModuleImpl extends ValidationModuleImpl implements
 						}
 						namesOfInvalidColumns.append(xsdElement.getAttributeValue(nameAttributeDescription));
 					}
-				}
-				
+				}	
 			} else {
 				validDatabase = false;
 			}
