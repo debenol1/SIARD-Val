@@ -18,9 +18,13 @@ Boston, MA 02110-1301 USA or see <http://www.gnu.org/licenses/>.
 package ch.kostceco.tools.siardval.validation.module;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.jdom2.JDOMException;
 
 import ch.kostceco.tools.siardval.exception.module.ValidationEcolumnException;
 import ch.kostceco.tools.siardval.validation.ValidationModule;
+import ch.kostceco.tools.siardval.validation.bean.ValidationContext;
 
 /**
  * Validierungsschritt E (Spalten-Validierung) Wurden die Angaben aus
@@ -30,10 +34,9 @@ import ch.kostceco.tools.siardval.validation.ValidationModule;
  * @author Do Olivier Debenath
  */
 
-public interface ValidationEcolumnModule extends ValidationModule
-{
-
+public interface ValidationEcolumnModule extends ValidationModule {
 	public boolean validate( File siardDatei )
 			throws ValidationEcolumnException;
-
+	public boolean prepareValidation(ValidationContext validationContext) 
+			throws IOException, JDOMException, Exception;
 }
